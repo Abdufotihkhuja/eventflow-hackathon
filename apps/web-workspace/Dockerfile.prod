@@ -1,0 +1,52 @@
+FROM node:22-alpine AS builder
+
+WORKDIR /repo
+
+ENV NPM_CONFIG_FETCH_RETRIES=5 \
+    NPM_CONFIG_FETCH_RETRY_MINTIMEOUT=20000 \
+    NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT=120000 \
+    NPM_CONFIG_FETCH_TIMEOUT=600000 \
+    NPM_CONFIG_AUDIT=false
+
+# Корневой package-lock.json сгенерирован npm 11; npm 10 (в node:22-alpine)
+# отвергает его через `npm ci` ("Missing ... from lock file"). Обновляем npm
+# до версии, совместимой с локом. Слой до COPY — кэшируется.
+RUN npm install -g npm@11.3.0
+
+COPY package*.json ./
+COPY apps ./apps
+COPY packages ./packages
+
+RUN for attempt in 1 2 3 4 5; do npm ci --include-workspace-root --workspaces --include=optional --prefer-offline --no-audit && break; if [ "$attempt" = 5 ]; then exit 1; fi; echo "npm ci failed, retrying in 15s... ($attempt/5)"; sleep 15; done
+RUN npm run build:packages
+
+ARG VITE_API_URL
+ARG VITE_MEDIA_URL
+ARG VITE_PUBLIC_SITE_URL
+ARG VITE_ADMIN_APP_URL
+ARG VITE_YANDEX_MAPS_API_KEY=""
+
+ENV VITE_API_URL=${VITE_API_URL}
+ENV VITE_MEDIA_URL=${VITE_MEDIA_URL}
+ENV VITE_PUBLIC_SITE_URL=${VITE_PUBLIC_SITE_URL}
+ENV VITE_ADMIN_APP_URL=${VITE_ADMIN_APP_URL}
+ENV VITE_YANDEX_MAPS_API_KEY=${VITE_YANDEX_MAPS_API_KEY}
+
+RUN npm run build --workspace @eventflow/web-workspace
+
+FROM node:22-alpine AS production
+
+WORKDIR /app
+
+ENV NPM_CONFIG_FETCH_RETRIES=5 \
+    NPM_CONFIG_FETCH_RETRY_MINTIMEOUT=20000 \
+    NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT=120000 \
+    NPM_CONFIG_FETCH_TIMEOUT=600000 \
+    NPM_CONFIG_AUDIT=false
+
+RUN for attempt in 1 2 3 4 5; do npm install -g serve && break; if [ "$attempt" = 5 ]; then exit 1; fi; echo "npm install serve failed, retrying in 15s... ($attempt/5)"; sleep 15; done
+
+COPY --from=builder /repo/apps/web-workspace/dist ./dist
+
+EXPOSE 3000
+CMD ["serve", "-s", "dist", "-l", "3000"]

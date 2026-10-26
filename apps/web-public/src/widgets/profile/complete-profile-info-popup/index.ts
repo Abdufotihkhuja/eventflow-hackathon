@@ -1,0 +1,1 @@
+export { CompleteProfileInfoPopup } from "./ui";

@@ -1,0 +1,28 @@
+### Variables
+@baseUrl = http://localhost:3000/api/v1
+@token = YOUR_JWT_TOKEN_HERE
+
+### ============================================
+### Organization Dashboard API Tests
+### ============================================
+
+### 1. Получить статистику Dashboard
+GET {{baseUrl}}/organizations/dashboard/stats
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+### 2. Получить командную активность (по умолчанию 20 записей)
+GET {{baseUrl}}/organizations/dashboard/activity
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+### 3. Получить командную активность (10 записей)
+GET {{baseUrl}}/organizations/dashboard/activity?limit=10
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+### 4. Получить командную активность (5 записей)
+GET {{baseUrl}}/organizations/dashboard/activity?limit=5
+Authorization: Bearer {{token}}
+Content-Type: application/json
+

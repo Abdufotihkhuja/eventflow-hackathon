@@ -1,0 +1,66 @@
+---
+description: Стиль кода React+TS для web-workspace
+globs:
+  - "src/**/*"
+alwaysApply: true
+---
+
+# Общие
+
+- TS: `"strict": true`. Не используем `any` и принудительный non-null `!` без оснований.
+- Экспорт: **named** предпочтителен; `default` запрещён для UI/утилитных пакетов.
+- Имена: компоненты `PascalCase.tsx`; хуки `useXxx.ts`; слайсы `slice.ts`.
+- Компоненты — функциональные; типизируй props через `type Props = { ... }`.
+- Следуй уже существующему стилю файла: в проекте встречаются и одинарные, и двойные кавычки, не делай шумных косметических переписок без причины.
+
+# React
+
+- Сайд‑эффекты не размещай в рендерах.
+- `useEffect` допустим для интеграций, синхронизации с браузером, URL, DOM, editor/map APIs и подобных сценариев, которые уже есть в проекте.
+- Не добавляй мемоизацию автоматически. Учитывай, что в приложении включён React Compiler; `useMemo`/`useCallback` нужны только там, где они действительно улучшают поведение или API.
+
+# Tailwind + классы
+
+- Классы собираем через `cn()` (обёртка над `clsx` + `tailwind-merge`).
+- Варианты/состояния — через `class-variance-authority` (`cva`). Не плодим условные строки в JSX.
+- Не используем `@apply` массово; предпочтение — утилитам в JSX. Глобальные стили — только в `global.css`.
+
+# Data fetching
+
+- Для запросов и мутаций используй TanStack Query.
+- Query keys, invalidation и optimistic updates должны совпадать с паттерном соседних хуков в `src/features/**/api`.
+- Не вводи RTK Query или `createApi`: это не стек текущего workspace.
+
+# Пример
+
+```tsx
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@shared/lib/cn";
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 disabled:pointer-events-none",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        outline:
+          "border bg-background hover:bg-accent hover:text-accent-foreground",
+      },
+      size: { sm: "h-9 px-3", md: "h-10 px-4", lg: "h-11 px-6" },
+    },
+    defaultVariants: { variant: "default", size: "md" },
+  }
+);
+
+type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
+  VariantProps<typeof buttonVariants>;
+
+export function Button({ className, variant, size, ...props }: ButtonProps) {
+  return (
+    <button
+      className={cn(buttonVariants({ variant, size }), className)}
+      {...props}
+    />
+  );
+}
+```

@@ -1,0 +1,1 @@
+{"version":3,"file":"validation.js","sourceRoot":"","sources":["../../../src/messages/ru/validation.ts"],"names":[],"mappings":"AAAA,MAAM,CAAC,MAAM,UAAU,GAAG;IACxB,QAAQ,EAAE,oBAAoB;IAC9B,YAAY,EAAE,0BAA0B;IACxC,SAAS,EAAE,2BAA2B;IACtC,SAAS,EAAE,0BAA0B;IACrC,WAAW,EAAE,yBAAyB;IACtC,UAAU,EAAE,wBAAwB;IACpC,mBAAmB,EAAE,qBAAqB;CAClC,CAAC"}

@@ -1,0 +1,219 @@
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    ports:
+      - "${PROXY_HTTP_PORT:-80}:80"
+    environment:
+      PUBLIC_HOST: ${PUBLIC_HOST:-localhost}
+      WORKSPACE_HOST: ${WORKSPACE_HOST:-app.localhost}
+      ADMIN_HOST: ${ADMIN_HOST:-admin.localhost}
+      API_HOST: ${API_HOST:-api.localhost}
+    volumes:
+      - ./infra/nginx/default.dev.conf.template:/etc/nginx/templates/default.conf.template:ro
+    depends_on:
+      - api
+      - web-public
+      - web-workspace
+      - web-admin
+    networks:
+      default:
+        aliases:
+          - app.localhost
+          - admin.localhost
+          - api.localhost
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-eventflow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-eventflow_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-eventflow_db}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-eventflow} -d ${POSTGRES_DB:-eventflow_db}"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Local email catcher for development. Captures every outgoing email
+  # (invitations, certificates, registrations…) — view them at http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - "${MAILPIT_SMTP_PORT:-1025}:1025" # SMTP
+      - "${MAILPIT_UI_PORT:-8025}:8025" # Web UI
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_SMTP_AUTH_ACCEPT_ANY: "true"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "true"
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+      target: development
+    restart: unless-stopped
+    ports:
+      - "${API_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-eventflow}:${POSTGRES_PASSWORD:-eventflow_secret}@postgres:5432/${POSTGRES_DB:-eventflow_db}?schema=public
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+      JWT_ACCESS_EXPIRATION: ${JWT_ACCESS_EXPIRATION:-15m}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-7d}
+      UPLOADS_DIR: ${UPLOADS_DIR:-/data/uploads}
+      REGISTRATION_UPLOADS_DIR: ${REGISTRATION_UPLOADS_DIR:-/data/registration-files}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost,http://app.localhost,http://admin.localhost,http://localhost:3001,http://localhost:3002,http://localhost:3003,http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL:-http://api.localhost/api/v1/auth/google/callback}
+      LINKEDIN_CLIENT_ID: ${LINKEDIN_CLIENT_ID:-}
+      LINKEDIN_CLIENT_SECRET: ${LINKEDIN_CLIENT_SECRET:-}
+      LINKEDIN_CALLBACK_URL: ${LINKEDIN_CALLBACK_URL:-http://api.localhost/api/v1/auth/linkedin/callback}
+      MAIL_HOST: ${MAIL_HOST:-mailpit}
+      MAIL_PORT: ${MAIL_PORT:-1025}
+      MAIL_SECURE: ${MAIL_SECURE:-false}
+      MAIL_USER: ${MAIL_USER:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_FROM: ${MAIL_FROM:-EventFlow <noreply@eventflow.local>}
+      TAHRIRCHI_TOKEN: ${TAHRIRCHI_TOKEN:-}
+      TAHRIRCHI_URL: ${TAHRIRCHI_URL:-https://websocket.tahrirchi.uz/translate-v2}
+      TAHRIRCHI_MODEL: ${TAHRIRCHI_MODEL:-sayqalchi}
+      TAHRIRCHI_TIMEOUT_MS: ${TAHRIRCHI_TIMEOUT_MS:-15000}
+      FRONTEND_APP_URL: ${FRONTEND_APP_URL:-http://app.localhost}
+      FRONTEND_ADMIN_URL: ${FRONTEND_ADMIN_URL:-http://admin.localhost}
+      FRONTEND_PUBLIC_URL: ${FRONTEND_PUBLIC_URL:-http://localhost}
+      FRONTEND_URL: ${FRONTEND_URL:-http://app.localhost}
+      INTERNAL_JOB_TOKEN: ${INTERNAL_JOB_TOKEN:-eventflow-internal-job-token}
+      METRICS_INTERNAL_TOKEN: ${METRICS_INTERNAL_TOKEN:-eventflow-internal-metrics-token}
+      METRICS_ENABLED: ${METRICS_ENABLED:-true}
+      DB_SLOW_QUERY_THRESHOLD_MS: ${DB_SLOW_QUERY_THRESHOLD_MS:-500}
+      TICKET_QR_SECRET: ${TICKET_QR_SECRET:-dev-ticket-qr-secret-rotate-me-please-32+}
+      # Push-канал (BL-12/BL-14): выключен по умолчанию; включать только после
+      # загрузки FCM/APNs-кредов в Expo-проект.
+      EXPO_PUSH_ENABLED: ${EXPO_PUSH_ENABLED:-false}
+      EXPO_ACCESS_TOKEN: ${EXPO_ACCESS_TOKEN:-}
+    volumes:
+      - ./apps/api:/app
+      - /app/node_modules
+      - ./storage/uploads:/data/uploads
+      - ./storage/registration-files:/data/registration-files
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+
+  worker:
+    build:
+      context: ./apps/worker
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      REDIS_URL: redis://redis:6379
+      API_INTERNAL_URL: http://api:3000/api/v1/internal/jobs
+      INTERNAL_JOB_TOKEN: ${INTERNAL_JOB_TOKEN:-eventflow-internal-job-token}
+    volumes:
+      - ./apps/worker:/app
+      - /app/node_modules
+    depends_on:
+      api:
+        condition: service_started
+      redis:
+        condition: service_healthy
+
+  web-public:
+    build:
+      context: .
+      dockerfile: ./apps/web-public/Dockerfile
+      target: development
+    restart: unless-stopped
+    ports:
+      - "${WEB_PUBLIC_PORT:-3001}:3000"
+    environment:
+      NODE_ENV: development
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://api.localhost}
+      NEXT_PUBLIC_API_URL_INTERNAL: http://api:3000
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://app.localhost}
+      NEXT_PUBLIC_PUBLIC_URL: ${NEXT_PUBLIC_PUBLIC_URL:-http://localhost}
+    volumes:
+      - ./apps/web-public:/repo/apps/web-public
+      - ./packages:/repo/packages
+      - web_public_next:/repo/apps/web-public/.next
+    depends_on:
+      - api
+
+  web-workspace:
+    build:
+      context: .
+      dockerfile: ./apps/web-workspace/Dockerfile
+      target: development
+    restart: unless-stopped
+    ports:
+      - "${WEB_WORKSPACE_PORT:-3002}:3000"
+    environment:
+      NODE_ENV: development
+      VITE_API_URL: ${VITE_API_URL:-http://api.localhost/api}
+      VITE_MEDIA_URL: ${VITE_MEDIA_URL:-http://api.localhost}
+      VITE_PUBLIC_SITE_URL: ${VITE_PUBLIC_SITE_URL:-http://localhost}
+      VITE_ADMIN_APP_URL: ${VITE_ADMIN_APP_URL:-http://admin.localhost}
+      VITE_YANDEX_MAPS_API_KEY: ${VITE_YANDEX_MAPS_API_KEY:-}
+    volumes:
+      - ./apps/web-workspace:/repo/apps/web-workspace
+      - ./packages:/repo/packages
+    depends_on:
+      - api
+
+  web-admin:
+    build:
+      context: .
+      dockerfile: ./apps/web-admin/Dockerfile
+      target: development
+    restart: unless-stopped
+    ports:
+      - "${WEB_ADMIN_PORT:-3003}:3000"
+    environment:
+      NODE_ENV: development
+      VITE_API_URL: ${VITE_API_URL:-http://api.localhost/api}
+      VITE_MEDIA_URL: ${VITE_MEDIA_URL:-http://api.localhost}
+      VITE_PUBLIC_SITE_URL: ${VITE_PUBLIC_SITE_URL:-http://localhost}
+      VITE_WORKSPACE_APP_URL: ${VITE_WORKSPACE_APP_URL:-http://app.localhost}
+    volumes:
+      - ./apps/web-admin:/repo/apps/web-admin
+      - ./packages:/repo/packages
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
+  redis_data:
+  web_public_next:

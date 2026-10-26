@@ -1,0 +1,86 @@
+---
+description: Актуальные правила разработки EventFlow Backend (NestJS + Prisma + PostgreSQL)
+globs: src/**/*.ts, prisma/**/*.prisma
+alwaysApply: true
+---
+
+# EventFlow Backend
+
+Пиши изменения под реальную структуру `apps/api`, а не под абстрактный шаблон NestJS.
+
+## Актуальный стек
+
+- Node.js 20+
+- NestJS 11
+- Prisma 7 + PostgreSQL
+- JWT auth + OAuth
+- Swagger/OpenAPI
+- BullMQ для фоновых задач
+- `class-validator` и `class-transformer`
+
+## Как устроен текущий backend
+
+Это модульный монолит. Основная структура сегодня выглядит так:
+
+```text
+src/
+├── common/
+├── config/
+├── modules/
+│   ├── auth/
+│   ├── events/
+│   ├── organizations/
+│   ├── boards/
+│   ├── public/
+│   ├── super-admin/
+│   ├── iam/
+│   └── ...
+├── openapi/
+├── prisma/
+├── app.module.ts
+└── main.ts
+```
+
+Модули могут иметь разные формы:
+
+- плоский модуль (`controller + service + dto`)
+- модуль с `repository`
+- модуль с подпапками `application/`
+- модуль с вложенными доменами, например `events/agenda`, `boards/tasks`
+
+Следуй паттерну того модуля, который редактируешь. Не выравнивай весь backend под одну “идеальную” схему без прямой задачи.
+
+## Обязательные правила
+
+- Сохраняй обратную совместимость API, если задача явно не про breaking change.
+- Особенно осторожно работай с IAM-миграцией, `accountId`, legacy auth flow и `GET /api/v1/session/me`.
+- DTO остаются источником входной валидации.
+- Бизнес-логика живёт в сервисах или `application`-слое, а не в контроллерах.
+- Если в модуле уже есть `repository`, доступ к Prisma лучше держать там.
+- Если в модуле репозитория нет, не создавай его автоматически без реальной пользы.
+- Переиспользуй общие утилиты из `src/common` и соседние DTO/типы модуля.
+
+## Именование
+
+- Файлы: `kebab-case`
+- Классы: `PascalCase`
+- Методы и переменные: `camelCase`
+- DTO: `{Action}{Entity}Dto`
+- Guards: `{Name}Guard`
+- Services: `{Name}Service`
+- Repositories: `{Name}Repository`
+
+## При изменении API
+
+- Обновляй Swagger-декораторы и OpenAPI-экспорт, если меняется контракт.
+- Сверяйся с `packages/api-contracts` и SDK-пакетами, если изменение влияет на клиентов.
+- Новые публичные поля и эндпоинты должны быть документированы рядом с изменением.
+
+## Перед завершением задачи
+
+- Для этого репозитория автоматические тесты ограничиваем unit-уровнем.
+- Не добавляй integration/e2e/browser automation как обязательный слой без прямого запроса пользователя.
+- Проверь хотя бы релевантные команды для изменённой области:
+  - `npm run lint --workspace @eventflow/api`
+  - `npm run test --workspace @eventflow/api`
+  - `npm run openapi:export --workspace @eventflow/api`

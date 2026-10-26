@@ -1,0 +1,29 @@
+EventFlow
+Copyright (c) 2026 Eventflow AI. All rights reserved.
+Licensed under the EventFlow Hackathon License 1.0 (see LICENSE).
+
+This repository includes or depends on third-party software. Those
+components are not covered by the EventFlow Hackathon License and remain
+under their own licenses.
+
+Bundled in this repository
+--------------------------
+
+apps/mobile/vendor/react       react 19.1.0       MIT, Copyright (c) Meta Platforms, Inc. and affiliates
+apps/mobile/vendor/react-dom   react-dom 19.1.0   MIT, Copyright (c) Meta Platforms, Inc. and affiliates
+apps/mobile/vendor/scheduler   scheduler 0.26.0   MIT, Copyright (c) Meta Platforms, Inc. and affiliates
+
+The full license text of each bundled component is in its LICENSE file.
+
+Installed through npm
+---------------------
+
+Dependencies listed in package.json and package-lock.json are installed from
+the npm registry and are not redistributed in this repository. Each package
+carries its own license in node_modules/<package>/. Most are MIT, ISC,
+Apache-2.0 or BSD. Notable exceptions:
+
+- @blocknote/core, @blocknote/react, @blocknote/mantine: MPL-2.0
+- lightningcss, axe-core: MPL-2.0
+- @img/sharp-libvips-*: LGPL-3.0-or-later
+- caniuse-lite: CC-BY-4.0

@@ -1,0 +1,40 @@
+{
+  "name": "@eventflow/api-contracts",
+  "private": true,
+  "version": "0.1.0",
+  "license": "SEE LICENSE IN LICENSE",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./public": {
+      "types": "./src/public.ts",
+      "default": "./dist/public.js"
+    },
+    "./account": {
+      "types": "./src/account.ts",
+      "default": "./dist/account.js"
+    },
+    "./workspace": {
+      "types": "./src/workspace.ts",
+      "default": "./dist/workspace.js"
+    },
+    "./admin": {
+      "types": "./src/admin.ts",
+      "default": "./dist/admin.js"
+    }
+  },
+  "files": [
+    "dist",
+    "openapi",
+    "src/generated/openapi.ts"
+  ],
+  "scripts": {
+    "generate": "openapi-typescript ./openapi/eventflow.openapi.json --output ./src/generated/openapi.ts --enum",
+    "build": "tsc -p tsconfig.json",
+    "type-check": "tsc -p tsconfig.json --noEmit",
+    "check": "npm run generate && npm run type-check"
+  }
+}

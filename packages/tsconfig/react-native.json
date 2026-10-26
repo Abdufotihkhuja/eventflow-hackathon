@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "@eventflow/tsconfig — react-native",
+  "_comment": "Layer for the Expo app. Compose it AFTER expo/tsconfig.base in the app tsconfig (extends: [\"expo/tsconfig.base\", \"@eventflow/tsconfig/react-native.json\"]) so Expo provides RN/Metro defaults and this layer re-asserts EventFlow strictness. Path aliases + include/exclude stay in the app's own tsconfig.",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowJs": true,
+    "noEmit": true
+  }
+}

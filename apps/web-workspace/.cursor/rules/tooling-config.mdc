@@ -1,0 +1,30 @@
+---
+description: Алиасы, ESLint/Prettier, Vite, Tailwind, shadcn/ui и env
+globs:
+  - "**/*"
+alwaysApply: false
+---
+
+# Алиасы (tsconfig.json)
+
+```json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": ["src/app/*"],
+      "@pages/*": ["src/pages/*"],
+      "@widgets/*": ["src/widgets/*"],
+      "@features/*": ["src/features/*"],
+      "@entities/*": ["src/entities/*"],
+      "@shared/*": ["src/shared/*"]
+    }
+  }
+}
+```
+
+# Проверки и тесты
+
+- Для `web-workspace` используй минимально достаточные проверки: `npm run lint`, а для release-sensitive изменений также `npm run build`.
+- Если задача требует автоматических тестов, ограничивайся unit-уровнем.
+- Не добавляй integration/e2e/browser automation как обязательный слой без прямого запроса.

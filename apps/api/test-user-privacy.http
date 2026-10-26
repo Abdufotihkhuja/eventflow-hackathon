@@ -1,0 +1,68 @@
+### Настройки приватности пользователя - Тесты
+
+@baseUrl = http://localhost:3000/api/v1
+@accessToken = YOUR_ACCESS_TOKEN_HERE
+
+### 1. Получить текущий профиль пользователя
+GET {{baseUrl}}/account/me
+Authorization: Bearer {{accessToken}}
+
+###
+
+### 2. Обновить настройки приватности - сделать профиль приватным
+PATCH {{baseUrl}}/account/me/privacy
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "isPublicProfile": false,
+  "showEmail": false,
+  "showPhone": false
+}
+
+###
+
+### 3. Обновить настройки приватности - сделать профиль публичным с видимым email
+PATCH {{baseUrl}}/account/me/privacy
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "isPublicProfile": true,
+  "showEmail": true,
+  "showPhone": false
+}
+
+###
+
+### 4. Обновить настройки приватности - показать телефон
+PATCH {{baseUrl}}/account/me/privacy
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "showPhone": true
+}
+
+###
+
+### 5. Экспортировать данные пользователя
+GET {{baseUrl}}/account/me/export
+Authorization: Bearer {{accessToken}}
+
+###
+
+### 6. Обновить профиль (для проверки что новые поля не конфликтуют)
+PATCH {{baseUrl}}/account/me
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Иван Иванов",
+  "phone": "+998901234567",
+  "location": "Ташкент, Узбекистан",
+  "bio": "Разработчик с опытом работы..."
+}
+
+###
+

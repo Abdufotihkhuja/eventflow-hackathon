@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # Версия npm зафиксирована в package.json (engines + packageManager):
+      # npm 10 и 11 по-разному резолвят лок, и разъезд ломает `npm ci`.
+      - name: Pin npm
+        run: npm i -g npm@10.9.8
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build workspace
+        run: npm run build
+
+      # `npm run build` regenerates the OpenAPI spec + types from the live
+      # controllers; any diff against the committed contracts is drift (D-2).
+      - name: Verify contracts are drift-free
+        run: node ./scripts/check-contracts-drift.mjs --no-gen
+
+      - name: Type check
+        run: npm run type-check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test

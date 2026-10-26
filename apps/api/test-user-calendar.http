@@ -1,0 +1,82 @@
+### Календарь активности пользователя - Тесты
+
+@baseUrl = http://localhost:3000/api/v1
+@accessToken = YOUR_ACCESS_TOKEN_HERE
+
+### 1. Получить календарь активности на март 2025
+GET {{baseUrl}}/account/me/calendar?year=2025&month=3
+Authorization: Bearer {{accessToken}}
+
+###
+
+### 2. Получить календарь активности с фильтром по роли (SPEAKER)
+GET {{baseUrl}}/account/me/calendar?year=2025&month=3&role=SPEAKER
+Authorization: Bearer {{accessToken}}
+
+###
+
+### 3. Получить события на конкретную дату
+GET {{baseUrl}}/account/me/calendar/events?date=2025-03-05
+Authorization: Bearer {{accessToken}}
+
+###
+
+### 4. Получить события на дату с фильтром по роли
+GET {{baseUrl}}/account/me/calendar/events?date=2025-03-05&role=PARTICIPANT
+Authorization: Bearer {{accessToken}}
+
+###
+
+### 5. Зарегистрироваться на событие с ролью SPEAKER и днями перелёта
+# Замените EVENT_ID на реальный UUID события
+@eventId = YOUR_EVENT_ID_HERE
+
+POST {{baseUrl}}/events/{{eventId}}/register
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "role": "SPEAKER",
+  "travelStartDate": "2025-03-04",
+  "travelEndDate": "2025-03-04",
+  "preparationDays": 2,
+  "answers": []
+}
+
+###
+
+### 6. Обновить регистрацию - изменить роль и добавить дни перелёта
+# Замените REGISTRATION_ID на реальный UUID регистрации
+@registrationId = YOUR_REGISTRATION_ID_HERE
+
+PATCH {{baseUrl}}/registrations/{{registrationId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "role": "MENTOR",
+  "travelStartDate": "2025-03-03",
+  "travelEndDate": "2025-03-04",
+  "preparationDays": 3
+}
+
+###
+
+### 7. Обновить регистрацию - убрать дни перелёта
+PATCH {{baseUrl}}/registrations/{{registrationId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "travelStartDate": null,
+  "travelEndDate": null
+}
+
+###
+
+### 8. Получить мои регистрации
+GET {{baseUrl}}/my-registrations?page=1&limit=10
+Authorization: Bearer {{accessToken}}
+
+###
+

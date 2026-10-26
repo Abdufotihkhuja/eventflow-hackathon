@@ -1,0 +1,13 @@
+---
+alwaysApply: true
+---
+
+Минимальные проверки для изменений в `web-public`:
+
+- `npm run lint`
+- `npm run type-check`
+- `npm run format:check` — если менялись форматируемые файлы или документация
+- `npm run build` — для release-sensitive изменений, routing, config, env и интеграций
+
+Не придумывай для этого приложения несуществующий `npm test`: отдельного default test script сейчас нет.
+Если в рамках задачи всё же нужны автоматические тесты, ограничивайся unit-уровнем. Не добавляй integration/e2e/browser automation без прямого запроса.

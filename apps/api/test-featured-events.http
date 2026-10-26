@@ -1,0 +1,85 @@
+### ============================================
+### Тестирование функционала "Топовые события"
+### ============================================
+
+### 1. Авторизация супер-админа
+POST http://localhost:3000/api/v1/auth/super-admin/login
+Content-Type: application/json
+
+{
+  "email": "admin@eventflow.uz",
+  "password": "SecureAdminPass123!"
+}
+
+### Сохраните accessToken из ответа
+@accessToken = YOUR_ACCESS_TOKEN_HERE
+
+### ============================================
+### Управление топовыми событиями (Супер-админ)
+### ============================================
+
+### 2. Переключить статус топового события (toggle)
+PATCH http://localhost:3000/api/v1/super-admin/events/550e8400-e29b-41d4-a716-446655440000/featured
+Authorization: Bearer {{accessToken}}
+
+### 3. Toggle обратно (убрать из топовых)
+PATCH http://localhost:3000/api/v1/super-admin/events/550e8400-e29b-41d4-a716-446655440000/featured
+Authorization: Bearer {{accessToken}}
+
+### ============================================
+### Публичный API (проверка сортировки)
+### ============================================
+
+### 4. Получить список событий (топовые должны быть первыми)
+GET http://localhost:3000/api/v1/public/events?filter=upcoming&limit=10
+
+### 5. Получить список с поиском
+GET http://localhost:3000/api/v1/public/events?search=конференция&limit=5
+
+### 6. Получить прошедшие события
+GET http://localhost:3000/api/v1/public/events?filter=past&limit=10
+
+### 7. Фильтр по городу
+GET http://localhost:3000/api/v1/public/events?city=Ташкент&limit=10
+
+### 8. Фильтр по формату
+GET http://localhost:3000/api/v1/public/events?format=ONLINE&limit=10
+
+### 9. Получить ТОЛЬКО топовые события
+GET http://localhost:3000/api/v1/public/events?featured=true&limit=10
+
+### 10. Получить топовые онлайн-события
+GET http://localhost:3000/api/v1/public/events?featured=true&format=ONLINE&limit=10
+
+### 11. Получить НЕ топовые события
+GET http://localhost:3000/api/v1/public/events?featured=false&limit=10
+
+### 12. Поиск среди топовых событий
+GET http://localhost:3000/api/v1/public/events?featured=true&search=конференция
+
+### ============================================
+### Получение событий супер-админом
+### ============================================
+
+### 13. Получить все события с фильтром (супер-админ)
+GET http://localhost:3000/api/v1/super-admin/events?page=1&limit=20
+Authorization: Bearer {{accessToken}}
+
+### 14. Получить конкретное событие по ID
+GET http://localhost:3000/api/v1/super-admin/events/550e8400-e29b-41d4-a716-446655440000
+Authorization: Bearer {{accessToken}}
+
+### ============================================
+### Проверка ошибок
+### ============================================
+
+### 15. Попытка без авторизации (должно вернуть 401)
+PATCH http://localhost:3000/api/v1/super-admin/events/550e8400-e29b-41d4-a716-446655440000/featured
+
+### 16. Попытка с несуществующим ID (должно вернуть 404)
+PATCH http://localhost:3000/api/v1/super-admin/events/00000000-0000-0000-0000-000000000000/featured
+Authorization: Bearer {{accessToken}}
+
+### 17. Попытка с невалидным UUID (должно вернуть 400)
+PATCH http://localhost:3000/api/v1/super-admin/events/invalid-uuid/featured
+Authorization: Bearer {{accessToken}}

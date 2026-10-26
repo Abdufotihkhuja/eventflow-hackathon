@@ -1,0 +1,23 @@
+export const cities = {
+    tashkent: "Ташкент",
+    samarkand: "Самарканд",
+    bukhara: "Бухара",
+    andijan: "Андижан",
+    namangan: "Наманган",
+    fergana: "Фергана",
+    nukus: "Нукус",
+    qarshi: "Карши",
+    termez: "Термез",
+    urgench: "Ургенч",
+    khiva: "Хива",
+    navoi: "Навои",
+    jizzakh: "Джизак",
+    gulistan: "Гулистан",
+    nurafshon: "Нурафшон",
+    kokand: "Коканд",
+    margilan: "Маргилан",
+    chirchiq: "Чирчик",
+    angren: "Ангрен",
+    almalyk: "Алмалык",
+};
+//# sourceMappingURL=cities.js.map

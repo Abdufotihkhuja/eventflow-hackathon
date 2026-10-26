@@ -1,0 +1,13 @@
+export const ACCOUNT_RESOLUTION_CODES = {
+  IDENTITY_NOT_FOUND: 'ACCOUNT_IDENTITY_NOT_FOUND',
+  IDENTITY_ORPHANED: 'ACCOUNT_IDENTITY_ORPHANED',
+  RECONCILIATION_REQUIRED: 'ACCOUNT_RECONCILIATION_REQUIRED',
+  ACCOUNT_DEACTIVATED: 'ACCOUNT_DEACTIVATED',
+} as const;
+
+export const accountResolutionError = (
+  code: (typeof ACCOUNT_RESOLUTION_CODES)[keyof typeof ACCOUNT_RESOLUTION_CODES],
+) => ({
+  code,
+  message: 'Сессия аккаунта недоступна',
+});

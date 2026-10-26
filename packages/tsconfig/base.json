@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "@eventflow/tsconfig — base",
+  "_comment": "Framework-agnostic strict TypeScript base shared by every EventFlow workspace. Deliberately does NOT set target/module/lib — those belong to the derived configs (library.json, react-native.json) so each runtime can pick its own. Mirrors the strictness the web apps already enforce inline.",
+  "compilerOptions": {
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "useUnknownInCatchVariables": true
+  }
+}

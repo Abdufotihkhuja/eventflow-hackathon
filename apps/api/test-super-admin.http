@@ -1,0 +1,178 @@
+@baseUrl = http://localhost:3000/api/v1
+@superAdminToken = YOUR_SUPER_ADMIN_TOKEN
+@userId = USER_UUID_HERE
+@orgId = ORG_UUID_HERE
+@eventId = EVENT_UUID_HERE
+
+### Получить статистику системы
+GET {{baseUrl}}/super-admin/stats
+Authorization: Bearer {{superAdminToken}}
+
+### ==================== ПОЛЬЗОВАТЕЛИ ====================
+
+### Получить всех пользователей
+GET {{baseUrl}}/super-admin/users
+Authorization: Bearer {{superAdminToken}}
+
+### Получить пользователей с фильтрами
+GET {{baseUrl}}/super-admin/users?page=1&limit=10&search=test&isEmailVerified=true
+Authorization: Bearer {{superAdminToken}}
+
+### Получить только неверифицированных пользователей
+GET {{baseUrl}}/super-admin/users?isEmailVerified=false
+Authorization: Bearer {{superAdminToken}}
+
+### Получить включая удалённых
+GET {{baseUrl}}/super-admin/users?includeDeleted=true
+Authorization: Bearer {{superAdminToken}}
+
+### Получить пользователя по ID
+GET {{baseUrl}}/super-admin/users/{{userId}}
+Authorization: Bearer {{superAdminToken}}
+
+### Редактировать пользователя (без изменения статуса)
+PATCH {{baseUrl}}/super-admin/users/{{userId}}
+Authorization: Bearer {{superAdminToken}}
+Content-Type: application/json
+
+{
+  "name": "Новое имя",
+  "phone": "+998901234567",
+  "location": "Ташкент",
+  "isEmailVerified": true
+}
+
+### ==================== ОРГАНИЗАЦИИ ====================
+
+### Получить все организации
+GET {{baseUrl}}/super-admin/organizations
+Authorization: Bearer {{superAdminToken}}
+
+### Получить организации со статусом PENDING
+GET {{baseUrl}}/super-admin/organizations?verificationStatus=PENDING
+Authorization: Bearer {{superAdminToken}}
+
+### Получить организации со статусом APPROVED
+GET {{baseUrl}}/super-admin/organizations?verificationStatus=APPROVED
+Authorization: Bearer {{superAdminToken}}
+
+### Получить организации со статусом REJECTED
+GET {{baseUrl}}/super-admin/organizations?verificationStatus=REJECTED
+Authorization: Bearer {{superAdminToken}}
+
+### Поиск организаций
+GET {{baseUrl}}/super-admin/organizations?search=компания
+Authorization: Bearer {{superAdminToken}}
+
+### Получить организации на верификации (старый endpoint)
+GET {{baseUrl}}/super-admin/organizations/pending
+Authorization: Bearer {{superAdminToken}}
+
+### Получить организацию по ID
+GET {{baseUrl}}/super-admin/organizations/{{orgId}}
+Authorization: Bearer {{superAdminToken}}
+
+### Редактировать организацию (без изменения статуса верификации)
+PATCH {{baseUrl}}/super-admin/organizations/{{orgId}}
+Authorization: Bearer {{superAdminToken}}
+Content-Type: application/json
+
+{
+  "name": "Новое имя представителя",
+  "companyName": "Новое название компании",
+  "description": "Новое описание организации",
+  "phone": "+998901234567"
+}
+
+### Одобрить организацию
+POST {{baseUrl}}/super-admin/organizations/{{orgId}}/approve
+Authorization: Bearer {{superAdminToken}}
+
+### Отклонить организацию
+POST {{baseUrl}}/super-admin/organizations/{{orgId}}/reject
+Authorization: Bearer {{superAdminToken}}
+Content-Type: application/json
+
+{
+  "reason": "Не предоставлены документы"
+}
+
+### ==================== СОБЫТИЯ ====================
+
+### Получить все события
+GET {{baseUrl}}/super-admin/events
+Authorization: Bearer {{superAdminToken}}
+
+### Получить события со статусом PENDING_REVIEW
+GET {{baseUrl}}/super-admin/events?status=PENDING_REVIEW
+Authorization: Bearer {{superAdminToken}}
+
+### Получить события со статусом PUBLISHED
+GET {{baseUrl}}/super-admin/events?status=PUBLISHED
+Authorization: Bearer {{superAdminToken}}
+
+### Получить события со статусом DRAFT
+GET {{baseUrl}}/super-admin/events?status=DRAFT
+Authorization: Bearer {{superAdminToken}}
+
+### Получить события со статусом CANCELLED
+GET {{baseUrl}}/super-admin/events?status=CANCELLED
+Authorization: Bearer {{superAdminToken}}
+
+### Получить события со статусом COMPLETED
+GET {{baseUrl}}/super-admin/events?status=COMPLETED
+Authorization: Bearer {{superAdminToken}}
+
+### Фильтр по формату (ONLINE)
+GET {{baseUrl}}/super-admin/events?format=ONLINE
+Authorization: Bearer {{superAdminToken}}
+
+### Фильтр по типу (FREE)
+GET {{baseUrl}}/super-admin/events?type=FREE
+Authorization: Bearer {{superAdminToken}}
+
+### Фильтр по организации
+GET {{baseUrl}}/super-admin/events?organizationId={{orgId}}
+Authorization: Bearer {{superAdminToken}}
+
+### Комбинированный фильтр
+GET {{baseUrl}}/super-admin/events?status=PUBLISHED&format=OFFLINE&type=PAID&page=1&limit=10
+Authorization: Bearer {{superAdminToken}}
+
+### Поиск событий
+GET {{baseUrl}}/super-admin/events?search=конференция
+Authorization: Bearer {{superAdminToken}}
+
+### Получить события на модерации (старый endpoint)
+GET {{baseUrl}}/super-admin/events/pending
+Authorization: Bearer {{superAdminToken}}
+
+### Получить событие по ID
+GET {{baseUrl}}/super-admin/events/{{eventId}}
+Authorization: Bearer {{superAdminToken}}
+
+### Редактировать событие (без изменения статуса)
+PATCH {{baseUrl}}/super-admin/events/{{eventId}}
+Authorization: Bearer {{superAdminToken}}
+Content-Type: application/json
+
+{
+  "title": "Обновлённое название",
+  "description": "Обновлённое описание мероприятия",
+  "venue": "Новое место проведения",
+  "maxParticipants": 200
+}
+
+### Одобрить событие
+POST {{baseUrl}}/super-admin/events/{{eventId}}/approve
+Authorization: Bearer {{superAdminToken}}
+
+### Отклонить событие
+POST {{baseUrl}}/super-admin/events/{{eventId}}/reject
+Authorization: Bearer {{superAdminToken}}
+Content-Type: application/json
+
+{
+  "reason": "Недостаточно информации о мероприятии"
+}
+

@@ -1,0 +1,7 @@
+export { TaskDetailPage } from './ui/task-detail-page'
+export { TaskDetailHeader } from './ui/task-detail-header'
+export { TaskDetailContent } from './ui/task-detail-content'
+export { TaskDetailSidebar } from './ui/task-detail-sidebar'
+export { TaskTimelineActivity } from './ui/task-timeline-activity'
+export { TaskActions } from './ui/task-actions'
+export { default } from './ui/task-detail-page'

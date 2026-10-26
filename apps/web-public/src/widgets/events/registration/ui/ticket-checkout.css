@@ -1,0 +1,170 @@
+/* Ticket checkout block (P-15) — calm-editorial, в тон cm-reg-* стилей
+   страницы регистрации. Только токены bone/ink/ember, светлая тема;
+   ember-500 для текста на bone (AA-прецедент /pricing). */
+
+.cm-ticket {
+  background: var(--bg-2);
+  border: 1px solid var(--border-1);
+  border-radius: var(--radius-lg);
+  padding: clamp(20px, 2.8vw, 28px);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+  text-align: left;
+  margin: 20px 0 4px;
+}
+
+.cm-ticket__title {
+  font: 700 clamp(17px, 1.9vw, 20px) / 1.25 var(--font-sans);
+  letter-spacing: -0.02em;
+  color: var(--ink-400);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.cm-ticket__intro,
+.cm-ticket__note {
+  font: 400 14px/1.6 var(--font-sans);
+  color: var(--fg-2);
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.cm-ticket__amount-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.cm-ticket__amount-label {
+  font: 600 11px/1 var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+.cm-ticket__amount {
+  font: 700 clamp(20px, 2.4vw, 26px) / 1.1 var(--font-sans);
+  letter-spacing: -0.02em;
+  color: var(--ink-400);
+  font-variant-numeric: tabular-nums;
+}
+
+.cm-ticket__hold {
+  font: 500 13px/1.5 var(--font-sans);
+  color: var(--ember-500);
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+.cm-ticket__hold-left {
+  color: var(--ink-100);
+  font-weight: 400;
+}
+
+.cm-ticket__notice {
+  font: 400 13px/1.55 var(--font-sans);
+  color: var(--ink-200);
+  background: var(--bone-100);
+  border: 1px solid var(--border-1);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.cm-ticket__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 13px 20px;
+  background: var(--ember-400);
+  color: var(--bone-50);
+  border: 0;
+  border-radius: var(--radius-lg);
+  font: 700 15px/1 var(--font-sans);
+  cursor: pointer;
+  transition:
+    background 0.15s var(--ease-standard),
+    transform 0.15s var(--ease-standard);
+}
+.cm-ticket__cta:hover {
+  background: var(--ember-500);
+  transform: translateY(-1px);
+}
+.cm-ticket__cta:active {
+  transform: translateY(0) scale(0.99);
+}
+.cm-ticket__cta:disabled {
+  background: var(--ink-50);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.cm-ticket__refresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  align-self: flex-start;
+  padding: 11px 16px;
+  background: transparent;
+  color: var(--ink-400);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius-md);
+  font: 600 14px/1 var(--font-sans);
+  cursor: pointer;
+  transition:
+    background 0.15s var(--ease-standard),
+    border-color 0.15s var(--ease-standard);
+}
+.cm-ticket__refresh:hover {
+  background: var(--bone-100);
+  border-color: var(--border-strong);
+}
+.cm-ticket__refresh:disabled {
+  color: var(--ink-50);
+  cursor: not-allowed;
+}
+
+.cm-ticket__cta:focus-visible,
+.cm-ticket__refresh:focus-visible {
+  outline: 2px solid var(--ember-400);
+  outline-offset: 2px;
+}
+
+.cm-ticket__error {
+  font: 400 13px/1.45 var(--font-sans);
+  color: var(--danger);
+  margin: 0;
+}
+
+.cm-ticket__paid {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.cm-ticket__paid-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: var(--success-soft);
+  color: var(--success);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.cm-ticket__paid-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+@media (max-width: 560px) {
+  .cm-ticket__refresh {
+    align-self: stretch;
+  }
+}

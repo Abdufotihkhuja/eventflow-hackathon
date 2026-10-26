@@ -1,0 +1,351 @@
+### Тесты для системы приглашений спикеров
+### Замените переменные перед использованием
+
+@baseUrl = http://localhost:3000/api/v1
+@organizationToken = YOUR_ORGANIZATION_JWT_TOKEN
+@userToken = YOUR_USER_JWT_TOKEN
+@eventId = YOUR_EVENT_UUID
+@speakerId = SPEAKER_UUID_FROM_RESPONSE
+@invitationToken = TOKEN_FROM_EMAIL
+
+###############################################
+# 1. ОТПРАВКА ПРИГЛАШЕНИЯ СПИКЕРУ
+###############################################
+
+### 1.1. Отправить приглашение существующему пользователю
+POST {{baseUrl}}/events/{{eventId}}/speakers/invite
+Authorization: Bearer {{organizationToken}}
+Content-Type: application/json
+
+{
+  "email": "existing-user@example.com",
+  "name": "Иван Иванов",
+  "position": "Senior Developer",
+  "company": "Google",
+  "bio": "Опытный разработчик с 10+ летним стажем в области backend разработки...",
+  "linkedinUrl": "https://linkedin.com/in/ivanov",
+  "instagramUrl": "https://instagram.com/ivanov",
+  "facebookUrl": "https://facebook.com/ivanov",
+  "xUrl": "https://x.com/ivanov",
+  "websiteUrl": "https://ivanov.dev"
+}
+
+### 1.2. Отправить приглашение новому пользователю (нет в системе)
+POST {{baseUrl}}/events/{{eventId}}/speakers/invite
+Authorization: Bearer {{organizationToken}}
+Content-Type: application/json
+
+{
+  "email": "new-speaker@example.com",
+  "name": "Петр Петров",
+  "position": "CTO",
+  "company": "TechCorp"
+}
+
+### 1.3. Попытка отправить дубликат приглашения (должен вернуть 409)
+POST {{baseUrl}}/events/{{eventId}}/speakers/invite
+Authorization: Bearer {{organizationToken}}
+Content-Type: application/json
+
+{
+  "email": "existing-user@example.com",
+  "name": "Иван Иванов",
+  "position": "Senior Developer"
+}
+
+### 1.4. Отправка с невалидным email (должен вернуть 400)
+POST {{baseUrl}}/events/{{eventId}}/speakers/invite
+Authorization: Bearer {{organizationToken}}
+Content-Type: application/json
+
+{
+  "email": "invalid-email",
+  "name": "Test User",
+  "position": "Developer"
+}
+
+### 1.5. Отправка без обязательных полей (должен вернуть 400)
+POST {{baseUrl}}/events/{{eventId}}/speakers/invite
+Authorization: Bearer {{organizationToken}}
+Content-Type: application/json
+
+{
+  "email": "test@example.com"
+}
+
+###############################################
+# 2. ПОЛУЧЕНИЕ ИНФОРМАЦИИ О ПРИГЛАШЕНИИ
+###############################################
+
+### 2.1. Получить информацию о приглашении (публичный endpoint)
+GET {{baseUrl}}/speakers/invitation/{{invitationToken}}
+
+### 2.2. Получить информацию с несуществующим токеном (должен вернуть 404)
+GET {{baseUrl}}/speakers/invitation/invalid-token-12345
+
+### 2.3. Получить информацию с истекшим токеном (должен вернуть 400)
+# Примечание: токен истекает через 48 часов, используйте старый токен для теста
+GET {{baseUrl}}/speakers/invitation/expired-token-12345
+
+###############################################
+# 3. ПРИНЯТИЕ ПРИГЛАШЕНИЯ
+###############################################
+
+### 3.1. Принять приглашение (авторизованный User)
+POST {{baseUrl}}/speakers/invitation/accept
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "token": "{{invitationToken}}"
+}
+
+### 3.2. Попытка принять приглашение без авторизации (должен вернуть 401)
+POST {{baseUrl}}/speakers/invitation/accept
+Content-Type: application/json
+
+{
+  "token": "{{invitationToken}}"
+}
+
+### 3.3. Попытка принять приглашение с неподходящим email (должен вернуть 400)
+# Примечание: User должен иметь другой email, чем указан в приглашении
+POST {{baseUrl}}/speakers/invitation/accept
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "token": "{{invitationToken}}"
+}
+
+### 3.4. Попытка принять уже обработанное приглашение (должен вернуть 400)
+POST {{baseUrl}}/speakers/invitation/accept
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "token": "{{invitationToken}}"
+}
+
+### 3.5. Попытка принять приглашение Organization аккаунтом (должен вернуть 403)
+POST {{baseUrl}}/speakers/invitation/accept
+Authorization: Bearer {{organizationToken}}
+Content-Type: application/json
+
+{
+  "token": "{{invitationToken}}"
+}
+
+###############################################
+# 4. ОТКЛОНЕНИЕ ПРИГЛАШЕНИЯ
+###############################################
+
+### 4.1. Отклонить приглашение с причиной
+POST {{baseUrl}}/speakers/invitation/reject
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "token": "{{invitationToken}}",
+  "reason": "К сожалению, в указанные даты у меня другие обязательства"
+}
+
+### 4.2. Отклонить приглашение без причины
+POST {{baseUrl}}/speakers/invitation/reject
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "token": "{{invitationToken}}"
+}
+
+### 4.3. Попытка отклонить без авторизации (должен вернуть 401)
+POST {{baseUrl}}/speakers/invitation/reject
+Content-Type: application/json
+
+{
+  "token": "{{invitationToken}}"
+}
+
+###############################################
+# 5. ПОВТОРНАЯ ОТПРАВКА ПРИГЛАШЕНИЯ
+###############################################
+
+### 5.1. Повторно отправить приглашение (PENDING статус)
+POST {{baseUrl}}/events/{{eventId}}/speakers/{{speakerId}}/resend-invitation
+Authorization: Bearer {{organizationToken}}
+
+### 5.2. Попытка повторно отправить приглашение ACCEPTED спикеру (должен вернуть 400)
+POST {{baseUrl}}/events/{{eventId}}/speakers/{{speakerId}}/resend-invitation
+Authorization: Bearer {{organizationToken}}
+
+### 5.3. Попытка повторно отправить несуществующему спикеру (должен вернуть 404)
+POST {{baseUrl}}/events/{{eventId}}/speakers/00000000-0000-0000-0000-000000000000/resend-invitation
+Authorization: Bearer {{organizationToken}}
+
+###############################################
+# 6. ПОЛУЧЕНИЕ СПИСКА СПИКЕРОВ (проверка статусов)
+###############################################
+
+### 6.1. Получить всех спикеров события
+GET {{baseUrl}}/events/{{eventId}}/speakers
+Authorization: Bearer {{organizationToken}}
+
+###############################################
+# 7. ПРОВЕРКА ИНТЕГРАЦИИ С REGISTRATION
+###############################################
+
+### 7.1. Получить календарь User после принятия приглашения
+# Событие должно отображаться с role=SPEAKER
+GET {{baseUrl}}/account/me/calendar
+Authorization: Bearer {{userToken}}
+
+### 7.2. Получить детали регистрации
+# Должна быть Registration с role=SPEAKER и status=APPROVED
+GET {{baseUrl}}/events/{{eventId}}/registrations
+Authorization: Bearer {{organizationToken}}
+
+###############################################
+# 8. EDGE CASES
+###############################################
+
+### 8.1. Отправка приглашения на мероприятие другой организации (должен вернуть 403)
+POST {{baseUrl}}/events/OTHER_ORG_EVENT_ID/speakers/invite
+Authorization: Bearer {{organizationToken}}
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "name": "Test User",
+  "position": "Developer"
+}
+
+### 8.2. Попытка принять приглашение с некорректным JSON (должен вернуть 400)
+POST {{baseUrl}}/speakers/invitation/accept
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "token": ""
+}
+
+### 8.3. Попытка отправить приглашение с очень длинным именем (должен вернуть 400)
+POST {{baseUrl}}/events/{{eventId}}/speakers/invite
+Authorization: Bearer {{organizationToken}}
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "name": "Очень длинное имя которое превышает максимально допустимую длину в двести символов и должно вызвать ошибку валидации потому что система не позволяет создавать такие длинные имена для спикеров и это правильно",
+  "position": "Developer"
+}
+
+###############################################
+# 9. ПОЛНЫЙ FLOW: СУЩЕСТВУЮЩИЙ ПОЛЬЗОВАТЕЛЬ
+###############################################
+
+### Шаг 1: Отправить приглашение
+POST {{baseUrl}}/events/{{eventId}}/speakers/invite
+Authorization: Bearer {{organizationToken}}
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "name": "John Doe",
+  "position": "Lead Developer",
+  "company": "TechCorp"
+}
+
+### Шаг 2: Получить информацию о приглашении (публично)
+# Скопируйте invitationToken из response шага 1
+GET {{baseUrl}}/speakers/invitation/TOKEN_FROM_STEP1
+
+### Шаг 3: Принять приглашение (авторизованный User с email john@example.com)
+POST {{baseUrl}}/speakers/invitation/accept
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "token": "TOKEN_FROM_STEP1"
+}
+
+### Шаг 4: Проверить что событие появилось в календаре
+GET {{baseUrl}}/account/me/calendar?role=SPEAKER
+Authorization: Bearer {{userToken}}
+
+###############################################
+# 10. ПОЛНЫЙ FLOW: НОВЫЙ ПОЛЬЗОВАТЕЛЬ
+###############################################
+
+### Шаг 1: Отправить приглашение на новый email
+POST {{baseUrl}}/events/{{eventId}}/speakers/invite
+Authorization: Bearer {{organizationToken}}
+Content-Type: application/json
+
+{
+  "email": "newuser@example.com",
+  "name": "New User",
+  "position": "Senior Engineer"
+}
+
+### Шаг 2: Новый пользователь регистрируется
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "newuser@example.com",
+  "password": "SecurePassword123!",
+  "firstName": "New",
+  "lastName": "User",
+  "userType": "USER"
+}
+
+### Шаг 3: Новый пользователь входит
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "newuser@example.com",
+  "password": "SecurePassword123!"
+}
+
+### Шаг 4: Новый пользователь принимает приглашение
+# Используйте accessToken из response шага 3
+POST {{baseUrl}}/speakers/invitation/accept
+Authorization: Bearer NEW_USER_TOKEN
+Content-Type: application/json
+
+{
+  "token": "TOKEN_FROM_STEP1"
+}
+
+###############################################
+# ПРИМЕЧАНИЯ ПО ИСПОЛЬЗОВАНИЮ
+###############################################
+
+# 1. Перед запуском тестов:
+#    - Замените @organizationToken на реальный JWT токен организации
+#    - Замените @userToken на реальный JWT токен пользователя
+#    - Замените @eventId на UUID существующего мероприятия
+#    - После шага 1.1 скопируйте ID спикера в @speakerId
+#    - После шага 1.1 скопируйте invitationToken из response в @invitationToken
+
+# 2. Для проверки email:
+#    - Настройте SMTP в .env файле
+#    - Или используйте Mailtrap.io для тестирования
+#    - Проверьте что письмо приходит с правильными ссылками
+
+# 3. Тестирование истечения токена:
+#    - Создайте приглашение
+#    - В БД обновите token_expires_at на прошедшую дату
+#    - Попытайтесь принять приглашение (должно вернуть 400)
+
+# 4. Проверка ролей и прав:
+#    - Member с правом EVENTS_UPDATE также может отправлять приглашения
+#    - Только USER тип может принимать/отклонять приглашения
+#    - Organization/Member не могут принять приглашение (403)
+
+# 5. Удобные команды для отладки:
+#    - Просмотр всех спикеров: GET /events/:id/speakers
+#    - Просмотр регистраций: GET /events/:id/registrations
+#    - Просмотр календаря: GET /account/me/calendar?role=SPEAKER

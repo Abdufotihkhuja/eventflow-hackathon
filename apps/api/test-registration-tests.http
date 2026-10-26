@@ -1,0 +1,328 @@
+### Тестирование системы тестов при регистрации (Режим TEST)
+
+@baseUrl = http://localhost:3000/api/v1
+@token = YOUR_JWT_TOKEN_HERE
+@userToken = YOUR_USER_JWT_TOKEN_HERE
+@eventIdAutoReject = YOUR_EVENT_ID_AUTO_REJECT
+@eventIdEvaluation = YOUR_EVENT_ID_EVALUATION
+
+### ========== СЦЕНАРИЙ 1: AUTO_REJECT (Автоматический отбор) ==========
+
+### 1. Создать событие с тестом AUTO_REJECT
+POST {{baseUrl}}/events
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Advanced JavaScript Workshop",
+  "description": "Воркшоп для опытных разработчиков",
+  "type": "FREE",
+  "format": "ONLINE",
+  "startDate": "2026-07-20T10:00:00Z",
+  "endDate": "2026-07-20T18:00:00Z",
+  "registrationMode": "TEST",
+  "testEvaluationType": "AUTO_REJECT",
+  "minTestScore": 70
+}
+
+### 2. Добавить открытый тестовый вопрос (15 баллов)
+POST {{baseUrl}}/events/{{eventIdAutoReject}}/questions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "question": "Объясните разницу между var, let и const",
+  "type": "TEXTAREA",
+  "category": "OPEN",
+  "points": 15,
+  "correctAnswer": "область видимости,hoisting,переопределение,const неизменяемый",
+  "isRequired": true,
+  "sortOrder": 0
+}
+
+### 3. Добавить закрытый тестовый вопрос (10 баллов)
+POST {{baseUrl}}/events/{{eventIdAutoReject}}/questions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "question": "Является ли JavaScript однопоточным языком?",
+  "type": "CHECKBOX",
+  "category": "CLOSED",
+  "options": ["Да", "Нет"],
+  "points": 10,
+  "correctAnswer": "Да",
+  "isRequired": true,
+  "sortOrder": 1
+}
+
+### 4. Добавить альтернативный вопрос с одним ответом (15 баллов)
+POST {{baseUrl}}/events/{{eventIdAutoReject}}/questions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "question": "Какой метод используется для добавления элемента в конец массива?",
+  "type": "SELECT",
+  "category": "ALTERNATIVE",
+  "options": ["push", "pop", "shift", "unshift"],
+  "correctOptions": ["push"],
+  "points": 15,
+  "isRequired": true,
+  "sortOrder": 2
+}
+
+### 5. Добавить альтернативный вопрос с несколькими ответами (20 баллов)
+POST {{baseUrl}}/events/{{eventIdAutoReject}}/questions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "question": "Какие из этих методов изменяют исходный массив?",
+  "type": "CHECKBOX",
+  "category": "ALTERNATIVE",
+  "options": ["push", "map", "splice", "filter", "sort"],
+  "correctOptions": ["push", "splice", "sort"],
+  "points": 20,
+  "isRequired": true,
+  "sortOrder": 3
+}
+
+### 6. Добавить сложный открытый вопрос (40 баллов)
+POST {{baseUrl}}/events/{{eventIdAutoReject}}/questions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "question": "Объясните Event Loop в JavaScript",
+  "type": "TEXTAREA",
+  "category": "OPEN",
+  "points": 40,
+  "correctAnswer": "call stack,callback queue,event loop,асинхронность",
+  "isRequired": true,
+  "sortOrder": 4
+}
+
+### Итого: 100 баллов, порог 70
+
+### 7. Регистрация пользователя - УСПЕШНОЕ прохождение теста (80+ баллов)
+POST {{baseUrl}}/registrations/events/{{eventIdAutoReject}}
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "answers": [
+    {
+      "questionId": "question-1-uuid",
+      "answer": "var имеет функциональную область видимости и hoisting, let и const имеют блочную область видимости, const нельзя переопределить"
+    },
+    {
+      "questionId": "question-2-uuid",
+      "answer": "Да"
+    },
+    {
+      "questionId": "question-3-uuid",
+      "answer": "push"
+    },
+    {
+      "questionId": "question-4-uuid",
+      "answer": "push,splice,sort"
+    },
+    {
+      "questionId": "question-5-uuid",
+      "answer": "Event loop управляет выполнением кода, обрабатывая call stack и callback queue для реализации асинхронности"
+    }
+  ]
+}
+
+### 8. Регистрация пользователя - ПРОВАЛ теста (< 70 баллов)
+POST {{baseUrl}}/registrations/events/{{eventIdAutoReject}}
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "answers": [
+    {
+      "questionId": "question-1-uuid",
+      "answer": "Не знаю"
+    },
+    {
+      "questionId": "question-2-uuid",
+      "answer": "Нет"
+    },
+    {
+      "questionId": "question-3-uuid",
+      "answer": "pop"
+    },
+    {
+      "questionId": "question-4-uuid",
+      "answer": "map,filter"
+    },
+    {
+      "questionId": "question-5-uuid",
+      "answer": "Это что-то про циклы"
+    }
+  ]
+}
+
+### ========== СЦЕНАРИЙ 2: EVALUATION (Оценка для организатора) ==========
+
+### 9. Создать событие с тестом EVALUATION
+POST {{baseUrl}}/events
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "JavaScript Bootcamp",
+  "description": "Обучение с распределением по уровням",
+  "type": "PAID",
+  "format": "OFFLINE",
+  "startDate": "2026-08-10T09:00:00Z",
+  "endDate": "2026-08-14T18:00:00Z",
+  "price": 50000,
+  "currency": "UZS",
+  "registrationMode": "TEST",
+  "testEvaluationType": "EVALUATION",
+  "minTestScore": 60
+}
+
+### 10. Добавить базовый вопрос (10 баллов)
+POST {{baseUrl}}/events/{{eventIdEvaluation}}/questions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "question": "Что такое переменная?",
+  "type": "SELECT",
+  "category": "ALTERNATIVE",
+  "options": [
+    "Контейнер для хранения данных",
+    "Функция",
+    "Цикл",
+    "Условие"
+  ],
+  "correctOptions": ["Контейнер для хранения данных"],
+  "points": 10,
+  "isRequired": true
+}
+
+### 11. Добавить средний вопрос (20 баллов)
+POST {{baseUrl}}/events/{{eventIdEvaluation}}/questions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "question": "Какие типы данных есть в JavaScript?",
+  "type": "CHECKBOX",
+  "category": "ALTERNATIVE",
+  "options": ["String", "Number", "Boolean", "Integer", "Object", "Undefined"],
+  "correctOptions": ["String", "Number", "Boolean", "Object", "Undefined"],
+  "points": 20,
+  "isRequired": true
+}
+
+### 12. Регистрация с низким результатом (30 баллов) - ВСЁ РАВНО ОДОБРЕН
+POST {{baseUrl}}/registrations/events/{{eventIdEvaluation}}
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "answers": [
+    {
+      "questionId": "question-eval-1-uuid",
+      "answer": "Функция"
+    },
+    {
+      "questionId": "question-eval-2-uuid",
+      "answer": "String,Integer"
+    }
+  ]
+}
+
+### 13. Регистрация с высоким результатом (30 баллов) - ОДОБРЕН
+POST {{baseUrl}}/registrations/events/{{eventIdEvaluation}}
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "answers": [
+    {
+      "questionId": "question-eval-1-uuid",
+      "answer": "Контейнер для хранения данных"
+    },
+    {
+      "questionId": "question-eval-2-uuid",
+      "answer": "String,Number,Boolean,Object,Undefined"
+    }
+  ]
+}
+
+### ========== ПРОВЕРКА ВАЛИДАЦИИ ==========
+
+### 14. Попытка создать тестовый вопрос без points (должна быть ошибка)
+POST {{baseUrl}}/events/{{eventIdAutoReject}}/questions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "question": "Тестовый вопрос без баллов",
+  "type": "TEXT",
+  "category": "OPEN",
+  "points": 0,
+  "isRequired": true
+}
+
+### 15. Попытка создать альтернативный тестовый вопрос без correctOptions (должна быть ошибка)
+POST {{baseUrl}}/events/{{eventIdAutoReject}}/questions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "question": "Вопрос без правильных ответов",
+  "type": "SELECT",
+  "category": "ALTERNATIVE",
+  "options": ["Вариант 1", "Вариант 2"],
+  "points": 10,
+  "isRequired": true
+}
+
+### 16. Попытка создать событие TEST без testEvaluationType (должна быть ошибка)
+POST {{baseUrl}}/events
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Некорректное событие",
+  "type": "FREE",
+  "format": "ONLINE",
+  "startDate": "2026-09-01T10:00:00Z",
+  "endDate": "2026-09-01T18:00:00Z",
+  "registrationMode": "TEST"
+}
+
+### 17. Попытка создать событие TEST без minTestScore (должна быть ошибка)
+POST {{baseUrl}}/events
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Некорректное событие",
+  "type": "FREE",
+  "format": "ONLINE",
+  "startDate": "2026-09-01T10:00:00Z",
+  "endDate": "2026-09-01T18:00:00Z",
+  "registrationMode": "TEST",
+  "testEvaluationType": "AUTO_REJECT"
+}
+
+### ========== ПРОСМОТР РЕЗУЛЬТАТОВ ==========
+
+### 18. Получить регистрации события (организатор видит testScore)
+GET {{baseUrl}}/events/{{eventIdEvaluation}}/registrations
+Authorization: Bearer {{token}}
+
+### 19. Получить детали регистрации с результатами теста
+GET {{baseUrl}}/registrations/{registrationId}
+Authorization: Bearer {{token}}
+
+###

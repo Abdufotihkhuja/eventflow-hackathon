@@ -1,0 +1,55 @@
+FROM node:22-alpine AS builder
+
+WORKDIR /repo
+
+ENV NPM_CONFIG_FETCH_RETRIES=5 \
+    NPM_CONFIG_FETCH_RETRY_MINTIMEOUT=20000 \
+    NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT=120000 \
+    NPM_CONFIG_FETCH_TIMEOUT=600000 \
+    NPM_CONFIG_AUDIT=false
+
+# Корневой package-lock.json сгенерирован npm 11; npm 10 (в node:22-alpine)
+# отвергает его через `npm ci` ("Missing ... from lock file"). Обновляем npm
+# до версии, совместимой с локом. Слой до COPY — кэшируется.
+RUN npm install -g npm@11.3.0
+
+COPY package*.json ./
+COPY apps ./apps
+COPY packages ./packages
+
+RUN for attempt in 1 2 3 4 5; do npm ci --include-workspace-root --workspaces --include=optional --prefer-offline --no-audit && break; if [ "$attempt" = 5 ]; then exit 1; fi; echo "npm ci failed, retrying in 15s... ($attempt/5)"; sleep 15; done
+RUN npm run build:packages
+
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_APP_URL
+ARG NEXT_PUBLIC_PUBLIC_URL
+ARG NEXT_PUBLIC_OAUTH_PROVIDERS=""
+ARG NEXT_PUBLIC_YANDEX_MAPS_API_KEY=""
+# Analytics — empty by default so non-prod builds ship no tags (no polluted stats).
+ARG NEXT_PUBLIC_GTM_ID=""
+ARG NEXT_PUBLIC_YM_ID=""
+
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+ENV NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
+ENV NEXT_PUBLIC_PUBLIC_URL=${NEXT_PUBLIC_PUBLIC_URL}
+ENV NEXT_PUBLIC_OAUTH_PROVIDERS=${NEXT_PUBLIC_OAUTH_PROVIDERS}
+ENV NEXT_PUBLIC_YANDEX_MAPS_API_KEY=${NEXT_PUBLIC_YANDEX_MAPS_API_KEY}
+ENV NEXT_PUBLIC_GTM_ID=${NEXT_PUBLIC_GTM_ID}
+ENV NEXT_PUBLIC_YM_ID=${NEXT_PUBLIC_YM_ID}
+
+RUN npm run build --workspace @eventflow/web-public
+
+FROM node:22-alpine AS production
+
+WORKDIR /repo
+ENV NODE_ENV=production
+
+COPY --from=builder /repo/package*.json ./
+COPY --from=builder /repo/node_modules ./node_modules
+COPY --from=builder /repo/apps/web-public ./apps/web-public
+COPY --from=builder /repo/packages ./packages
+
+WORKDIR /repo/apps/web-public
+
+EXPOSE 3000
+CMD ["npm", "run", "start", "--", "-H", "0.0.0.0", "-p", "3000"]

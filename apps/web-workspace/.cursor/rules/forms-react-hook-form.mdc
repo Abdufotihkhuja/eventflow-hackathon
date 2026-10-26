@@ -1,0 +1,294 @@
+---
+description: Правила работы с формами; react-hook-form, zod валидация, типизация
+globs:
+  - "src/features/**/ui/**/*form*.tsx"
+  - "src/features/**/ui/**/*Form*.tsx"
+  - "src/shared/ui/**/*form*.tsx"
+  - "src/shared/ui/**/*Form*.tsx"
+  - "src/pages/**/*form*.tsx"
+  - "src/pages/**/*Form*.tsx"
+alwaysApply: false
+---
+
+# Обязательные библиотеки
+
+- **react-hook-form** — управление состоянием форм
+- **zod** — валидация схем (предпочтительно над yup)
+- **@hookform/resolvers** — интеграция zod с react-hook-form
+
+# Структура форм
+
+## Размещение
+
+- Формы в `features/{feature}/ui/` — для конкретных фич
+- Переиспользуемые компоненты форм в `shared/ui/forms/`
+- Схемы валидации в `features/{feature}/lib/schemas/` или `shared/lib/schemas/`
+
+## Организация файлов
+
+features/auth/ui/
+├── login-form.tsx
+├── register-form.tsx
+└── index.ts
+features/auth/lib/
+├── schemas/
+│ ├── auth-schemas.ts
+│ └── index.ts
+└── index.ts
+
+# Паттерны использования
+
+## Базовая структура формы
+
+```tsx
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Button } from "@shared/ui/button";
+import { Input } from "@shared/ui/input";
+import { cn } from "@shared/lib/cn";
+
+// Схема валидации
+const loginSchema = z.object({
+  email: z.string().email("Некорректный email"),
+  password: z.string().min(6, "Минимум 6 символов"),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
+
+type LoginFormProps = {
+  onSubmit: (data: LoginFormData) => void;
+  isLoading?: boolean;
+  className?: string;
+};
+
+export function LoginForm({ onSubmit, isLoading, className }: LoginFormProps) {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    mode: "onBlur", // валидация при потере фокуса
+  });
+
+  return (
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className={cn("space-y-4", className)}
+    >
+      <div>
+        <Input
+          {...register("email")}
+          type="email"
+          placeholder="Email"
+          error={errors.email?.message}
+        />
+      </div>
+
+      <div>
+        <Input
+          {...register("password")}
+          type="password"
+          placeholder="Пароль"
+          error={errors.password?.message}
+        />
+      </div>
+
+      <Button
+        type="submit"
+        disabled={isSubmitting || isLoading}
+        className="w-full"
+      >
+        {isSubmitting ? "Вход..." : "Войти"}
+      </Button>
+    </form>
+  );
+}
+```
+
+## Хуки для форм
+
+```tsx
+// features/auth/lib/use-login-form.ts
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema, type LoginFormData } from "./schemas/auth-schemas";
+
+export function useLoginForm() {
+  return useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    mode: "onBlur",
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+}
+```
+
+## Схемы валидации
+
+```tsx
+// features/auth/lib/schemas/auth-schemas.ts
+import { z } from "zod";
+
+export const loginSchema = z.object({
+  email: z
+    .string()
+    .min(1, "Email обязателен")
+    .email("Некорректный формат email"),
+  password: z
+    .string()
+    .min(6, "Пароль должен содержать минимум 6 символов")
+    .max(100, "Пароль слишком длинный"),
+});
+
+export const registerSchema = z
+  .object({
+    email: z.string().email("Некорректный email"),
+    password: z.string().min(6, "Минимум 6 символов"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Пароли не совпадают",
+    path: ["confirmPassword"],
+  });
+
+export type LoginFormData = z.infer<typeof loginSchema>;
+export type RegisterFormData = z.infer<typeof registerSchema>;
+```
+
+# Интеграция с UI компонентами
+
+## Обёртки для полей
+
+```tsx
+// shared/ui/forms/form-field.tsx
+import { forwardRef } from "react";
+import { Input } from "@shared/ui/input";
+import { Label } from "@shared/ui/label";
+import { cn } from "@shared/lib/cn";
+
+type FormFieldProps = {
+  label?: string;
+  error?: string;
+  className?: string;
+} & React.ComponentProps<typeof Input>;
+
+export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
+  ({ label, error, className, ...props }, ref) => {
+    return (
+      <div className={cn("space-y-2", className)}>
+        {label && <Label htmlFor={props.id}>{label}</Label>}
+        <Input
+          ref={ref}
+          {...props}
+          className={cn(error && "border-destructive", className)}
+        />
+        {error && <p className="text-sm text-destructive">{error}</p>}
+      </div>
+    );
+  }
+);
+```
+
+## Селекты и сложные поля
+
+```tsx
+// Для селектов используй Controller
+import { Controller } from "react-hook-form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@shared/ui/select";
+
+<Controller
+  name="role"
+  control={control}
+  render={({ field }) => (
+    <Select onValueChange={field.onChange} defaultValue={field.value}>
+      <SelectTrigger>
+        <SelectValue placeholder="Выберите роль" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="admin">Администратор</SelectItem>
+        <SelectItem value="user">Пользователь</SelectItem>
+      </SelectContent>
+    </Select>
+  )}
+/>;
+```
+
+# Правила и соглашения
+
+## Именование
+
+- Компоненты форм: `{Feature}Form.tsx` (например, `LoginForm.tsx`)
+- Хуки форм: `use-{feature}-form.ts` (например, `use-login-form.ts`)
+- Схемы: `{feature}-schemas.ts` (например, `auth-schemas.ts`)
+
+## Типизация
+
+- Всегда используй `z.infer<typeof schema>` для типов данных форм
+- Экспортируй типы из схем для переиспользования
+- Используй строгую типизацию для `useForm<T>`
+
+## Валидация
+
+- Валидация на `onBlur` для лучшего UX
+- Показывай ошибки сразу после потери фокуса
+- Используй `mode: "onBlur"` в настройках формы
+
+## Обработка ошибок
+
+- Обрабатывай ошибки API в `onSubmit`
+- Показывай глобальные ошибки формы через `setError`
+- Используй `isSubmitting` для блокировки повторных отправок
+
+## Производительность
+
+- Используй `useCallback` для обработчиков форм
+- Мемоизируй сложные компоненты форм с `memo`
+- Избегай лишних ре-рендеров через правильную структуру зависимостей
+
+# Интеграция с TanStack Query
+
+```tsx
+// features/auth/api/use-login.ts
+import { useMutation } from "@tanstack/react-query";
+import { loginApi } from "../api/auth-api";
+
+export function useLogin() {
+  return useMutation({
+    mutationFn: loginApi,
+    onSuccess: (data) => {
+      // Обработка успешного входа
+    },
+    onError: (error) => {
+      // Обработка ошибок
+    },
+  });
+}
+
+// В компоненте формы
+const loginMutation = useLogin();
+
+const onSubmit = (data: LoginFormData) => {
+  loginMutation.mutate(data);
+};
+```
+
+# Checklist для форм
+
+- [ ] Используется `react-hook-form` с `zod` валидацией
+- [ ] Схемы валидации вынесены в отдельные файлы
+- [ ] Все поля типизированы через `z.infer`
+- [ ] Обработка ошибок настроена корректно
+- [ ] Форма интегрирована с TanStack Query (если нужно)
+- [ ] UI компоненты используют существующие поля и примитивы проекта
+- [ ] Валидация происходит на `onBlur`
+- [ ] Состояние загрузки обрабатывается

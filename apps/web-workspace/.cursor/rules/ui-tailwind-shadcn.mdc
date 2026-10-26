@@ -1,0 +1,66 @@
+---
+description: Правила UI-слоя для web-workspace (Tailwind + Radix + Mantine)
+globs:
+  - "src/shared/ui/**/*"
+  - "src/widgets/**/*"
+  - "src/pages/**/*"
+  - "src/features/**/*"
+  - "src/entities/**/*"
+alwaysApply: false
+---
+
+# Организация UI
+
+- В проекте уже используются Tailwind, Radix primitives, Mantine и локальные компоненты из `src/shared/ui`.
+- Расширяй существующие компоненты и паттерны, а не привноси новую UI-систему.
+- Если нужен базовый примитив, сначала проверь `src/shared/ui` и `src/shared/ui/shadcn`.
+- Все общие компоненты реэкспортируй через публичные `index.ts`, где это уже принято.
+
+# Токены и темы
+
+- Цвета/радиусы/тени — **только** через CSS‑переменные в `global.css` и маппинг в `tailwind.config`.
+- Тёмная тема — переключение классом `.dark`.
+
+# Классы и варианты
+
+- Собираем классы через `cn()` (объединяет и мержит конфликтующие утилиты).
+- Состояния/варианты — через `cva` (см. code-style-react-ts.mdc пример `Button`).
+- Не вноси «магические» цвета/px в JSX; используй утилиты и токены.
+
+# Обёртки
+
+- Для расширения базовых компонентов создавай обёртки и локальные композиции.
+- Не переписывай без причины существующие компоненты из `shared/ui/shadcn`, если задачу можно решить поверх них.
+
+# Иконки
+
+- `lucide-react`. Размер/цвет — через классы `h-4 w-4 text-muted-foreground`.
+
+# Пример использования существующих UI-примитивов
+
+```tsx
+import { Button } from "@shared/ui";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@shared/ui/shadcn/dialog";
+
+export function Demo() {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="default">Open</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Hello</DialogTitle>
+        </DialogHeader>
+        Content
+      </DialogContent>
+    </Dialog>
+  );
+}
+```

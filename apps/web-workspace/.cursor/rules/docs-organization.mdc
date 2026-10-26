@@ -1,0 +1,44 @@
+---
+description: Организация документации и задач для web-workspace
+globs:
+  - '**/*'
+alwaysApply: true
+---
+
+# Документация и задачи в `apps/web-workspace`
+
+У workspace уже есть собственные папки:
+
+- `apps/web-workspace/docs/`
+- `apps/web-workspace/tasks/`
+
+Именно они являются стандартным местом для app-specific markdown-файлов.
+
+## Что хранить в `apps/web-workspace/docs/`
+
+- документацию по фичам workspace
+- UI/UX и implementation notes
+- API usage guides для workspace
+- setup и troubleshooting именно этого приложения
+
+## Что хранить в `apps/web-workspace/tasks/`
+
+- планы
+- backlog
+- чеклисты
+- временные execution notes по задачам workspace
+
+## Когда использовать корневой `docs/`
+
+Только если материал относится к нескольким приложениям сразу или ко всей платформе:
+
+- deployment
+- monorepo architecture
+- общие API surfaces
+- общие правила для AI-агентов
+
+## Правила именования
+
+- предпочитай `kebab-case`
+- не создавай новые `.md` в корне приложения без явной причины
+- не перемещай старые документы массово, если это не отдельная задача по cleanup

@@ -1,0 +1,373 @@
+### === BlockNote Integration Tests для Events API ===
+### Проверка интеграции BlockNote rich text редактора
+
+@baseUrl = http://localhost:3000/api/v1
+@organizationToken = YOUR_ORGANIZATION_TOKEN_HERE
+@eventId = EVENT_ID_HERE
+
+### ===== 1. Создание события с BlockNote описанием =====
+### Тест базовой структуры с параграфом
+POST {{baseUrl}}/events
+Content-Type: application/json
+Authorization: Bearer {{organizationToken}}
+
+{
+  "title": "BlockNote Test Event",
+  "description": [
+    {
+      "id": "block1",
+      "type": "paragraph",
+      "props": {},
+      "content": [
+        {
+          "type": "text",
+          "text": "Это тестовое описание мероприятия с использованием BlockNote.",
+          "styles": {}
+        }
+      ],
+      "children": []
+    }
+  ],
+  "format": "ONLINE",
+  "type": "FREE",
+  "startDate": "2025-06-15T10:00:00Z",
+  "endDate": "2025-06-15T18:00:00Z",
+  "onlineUrl": "https://zoom.us/j/123456789"
+}
+
+### ===== 2. Создание события с богатым форматированием =====
+### Тест заголовков, списков, стилей и ссылок
+POST {{baseUrl}}/events
+Content-Type: application/json
+Authorization: Bearer {{organizationToken}}
+
+{
+  "title": "Rich Text Event",
+  "description": [
+    {
+      "id": "heading1",
+      "type": "heading",
+      "props": { "level": 1 },
+      "content": [
+        {
+          "type": "text",
+          "text": "Добро пожаловать на мероприятие!",
+          "styles": { "bold": true }
+        }
+      ],
+      "children": []
+    },
+    {
+      "id": "para1",
+      "type": "paragraph",
+      "props": {},
+      "content": [
+        {
+          "type": "text",
+          "text": "Это мероприятие про ",
+          "styles": {}
+        },
+        {
+          "type": "text",
+          "text": "технологии",
+          "styles": { "italic": true, "bold": true }
+        },
+        {
+          "type": "text",
+          "text": " и ",
+          "styles": {}
+        },
+        {
+          "type": "link",
+          "href": "https://example.com",
+          "content": [
+            {
+              "type": "text",
+              "text": "инновации",
+              "styles": { "underline": true }
+            }
+          ]
+        }
+      ],
+      "children": []
+    },
+    {
+      "id": "list1",
+      "type": "bulletListItem",
+      "props": {},
+      "content": [
+        {
+          "type": "text",
+          "text": "Первый пункт программы",
+          "styles": {}
+        }
+      ],
+      "children": [
+        {
+          "id": "list1-1",
+          "type": "bulletListItem",
+          "props": {},
+          "content": [
+            {
+              "type": "text",
+              "text": "Вложенный пункт",
+              "styles": {}
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "format": "HYBRID",
+  "type": "FREE",
+  "startDate": "2025-07-20T14:00:00Z",
+  "endDate": "2025-07-20T18:00:00Z",
+  "venue": "Конференц-зал",
+  "address": "г. Ташкент, ул. Навои, 1",
+  "onlineUrl": "https://meet.google.com/abc-defg-hij"
+}
+
+### ===== 3. Получение описания в HTML формате =====
+### Публичный endpoint с санитизацией
+GET {{baseUrl}}/events/{{eventId}}/description/html
+
+### ===== 4. Получение описания в текстовом формате =====
+### Публичный endpoint без форматирования
+GET {{baseUrl}}/events/{{eventId}}/description/text
+
+### ===== 5. Тест безопасности: попытка XSS атаки =====
+### Должен быть заблокирован валидатором или санитизацией
+POST {{baseUrl}}/events
+Content-Type: application/json
+Authorization: Bearer {{organizationToken}}
+
+{
+  "title": "XSS Test Event",
+  "description": [
+    {
+      "id": "xss1",
+      "type": "paragraph",
+      "props": {},
+      "content": [
+        {
+          "type": "text",
+          "text": "<script>alert('XSS')</script>",
+          "styles": {}
+        }
+      ],
+      "children": []
+    }
+  ],
+  "format": "ONLINE",
+  "type": "FREE",
+  "startDate": "2025-06-15T10:00:00Z",
+  "endDate": "2025-06-15T18:00:00Z",
+  "onlineUrl": "https://zoom.us/j/123456789"
+}
+
+### ===== 6. Тест безопасности: javascript: в ссылках =====
+### Должен быть заблокирован валидатором
+POST {{baseUrl}}/events
+Content-Type: application/json
+Authorization: Bearer {{organizationToken}}
+
+{
+  "title": "JavaScript URI Test",
+  "description": [
+    {
+      "id": "js1",
+      "type": "paragraph",
+      "props": {},
+      "content": [
+        {
+          "type": "link",
+          "href": "javascript:alert('XSS')",
+          "content": [
+            {
+              "type": "text",
+              "text": "Опасная ссылка",
+              "styles": {}
+            }
+          ]
+        }
+      ],
+      "children": []
+    }
+  ],
+  "format": "ONLINE",
+  "type": "FREE",
+  "startDate": "2025-06-15T10:00:00Z",
+  "endDate": "2025-06-15T18:00:00Z",
+  "onlineUrl": "https://zoom.us/j/123456789"
+}
+
+### ===== 7. Тест лимитов: слишком глубокая вложенность =====
+### Должен быть отклонен валидатором (MAX_NESTING_DEPTH = 10)
+POST {{baseUrl}}/events
+Content-Type: application/json
+Authorization: Bearer {{organizationToken}}
+
+{
+  "title": "Deep Nesting Test",
+  "description": [
+    {
+      "id": "l1",
+      "type": "bulletListItem",
+      "props": {},
+      "content": [{"type": "text", "text": "Level 1", "styles": {}}],
+      "children": [
+        {
+          "id": "l2",
+          "type": "bulletListItem",
+          "props": {},
+          "content": [{"type": "text", "text": "Level 2", "styles": {}}],
+          "children": [
+            {
+              "id": "l3",
+              "type": "bulletListItem",
+              "props": {},
+              "content": [{"type": "text", "text": "Level 3", "styles": {}}],
+              "children": [
+                {
+                  "id": "l4",
+                  "type": "bulletListItem",
+                  "props": {},
+                  "content": [{"type": "text", "text": "Level 4", "styles": {}}],
+                  "children": [
+                    {
+                      "id": "l5",
+                      "type": "bulletListItem",
+                      "props": {},
+                      "content": [{"type": "text", "text": "Level 5", "styles": {}}],
+                      "children": [
+                        {
+                          "id": "l6",
+                          "type": "bulletListItem",
+                          "props": {},
+                          "content": [{"type": "text", "text": "Level 6", "styles": {}}],
+                          "children": [
+                            {
+                              "id": "l7",
+                              "type": "bulletListItem",
+                              "props": {},
+                              "content": [{"type": "text", "text": "Level 7", "styles": {}}],
+                              "children": [
+                                {
+                                  "id": "l8",
+                                  "type": "bulletListItem",
+                                  "props": {},
+                                  "content": [{"type": "text", "text": "Level 8", "styles": {}}],
+                                  "children": [
+                                    {
+                                      "id": "l9",
+                                      "type": "bulletListItem",
+                                      "props": {},
+                                      "content": [{"type": "text", "text": "Level 9", "styles": {}}],
+                                      "children": [
+                                        {
+                                          "id": "l10",
+                                          "type": "bulletListItem",
+                                          "props": {},
+                                          "content": [{"type": "text", "text": "Level 10", "styles": {}}],
+                                          "children": [
+                                            {
+                                              "id": "l11",
+                                              "type": "bulletListItem",
+                                              "props": {},
+                                              "content": [{"type": "text", "text": "Level 11 - ДОЛЖЕН БЫТЬ ОТКЛОНЕН", "styles": {}}],
+                                              "children": []
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "format": "ONLINE",
+  "type": "FREE",
+  "startDate": "2025-06-15T10:00:00Z",
+  "endDate": "2025-06-15T18:00:00Z",
+  "onlineUrl": "https://zoom.us/j/123456789"
+}
+
+### ===== 8. Тест: пустое описание =====
+### Должен быть принят (description опционален)
+POST {{baseUrl}}/events
+Content-Type: application/json
+Authorization: Bearer {{organizationToken}}
+
+{
+  "title": "Event Without Description",
+  "format": "ONLINE",
+  "type": "FREE",
+  "startDate": "2025-06-15T10:00:00Z",
+  "endDate": "2025-06-15T18:00:00Z",
+  "onlineUrl": "https://zoom.us/j/123456789"
+}
+
+### ===== 9. Тест rate limiting =====
+### Сделайте 35 запросов подряд к /description/html
+### После 30-го должен вернуться 429 Too Many Requests
+GET {{baseUrl}}/events/{{eventId}}/description/html
+
+### ===== 10. Обновление события с новым описанием =====
+PATCH {{baseUrl}}/events/{{eventId}}
+Content-Type: application/json
+Authorization: Bearer {{organizationToken}}
+
+{
+  "description": [
+    {
+      "id": "updated1",
+      "type": "heading",
+      "props": { "level": 2 },
+      "content": [
+        {
+          "type": "text",
+          "text": "Обновлённое описание",
+          "styles": { "bold": true }
+        }
+      ],
+      "children": []
+    },
+    {
+      "id": "updated2",
+      "type": "paragraph",
+      "props": {},
+      "content": [
+        {
+          "type": "text",
+          "text": "Программа мероприятия была обновлена.",
+          "styles": {}
+        }
+      ],
+      "children": []
+    }
+  ]
+}
+
+### ===== Ожидаемые результаты =====
+###
+### 1-2: Должны успешно создаться (201 Created)
+### 3-4: Должны вернуть корректно конвертированные данные
+### 5-6: Должны быть отклонены валидатором (400 Bad Request) или санитизированы
+### 7: Должен быть отклонен (400 Bad Request - превышение глубины вложенности)
+### 8: Должен быть принят (201 Created)
+### 9: После 30 запросов должен вернуться 429 Too Many Requests
+### 10: Должен успешно обновиться (200 OK)

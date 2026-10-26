@@ -1,0 +1,3239 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ==================== ENUMS ====================
+
+enum AuthProvider {
+  EMAIL
+  GOOGLE
+  LINKEDIN
+}
+
+enum ActorKind {
+  USER
+  ORGANIZATION
+  MEMBER
+  SUPER_ADMIN
+}
+
+enum UserType {
+  USER
+  ORGANIZATION
+  MEMBER
+  SUPER_ADMIN
+}
+
+enum MembershipKind {
+  OWNER
+  MEMBER
+}
+
+enum PlatformRole {
+  SUPER_ADMIN
+}
+
+enum PlatformElevationMode {
+  READ
+  WRITE
+}
+
+enum MemberStatus {
+  ACTIVE // Активен
+  SUSPENDED // Приостановлен
+  INVITED // Приглашён (ожидает активации)
+}
+
+enum InviteStatus {
+  PENDING // Ожидает принятия
+  ACCEPTED // Принято — членство создано
+  EXPIRED // Истёк срок действия
+  REVOKED // Отозвано администратором
+  DECLINED // Приглашённый отказался (может оставить комментарий)
+}
+
+enum EventType {
+  FREE // Бесплатный
+  PAID // Платный
+}
+
+enum EventAccessType {
+  OPEN // Открытая регистрация (все могут зарегистрироваться)
+  REQUEST // По запросу (требуется одобрение организатора)
+  INVITE_ONLY // Только по приглашению (по ссылке/коду)
+  PRIVATE // Приватное событие, не показывается публично и не допускает внешнюю регистрацию
+}
+
+enum EventFormat {
+  ONLINE
+  OFFLINE
+  HYBRID
+}
+
+enum EventStatus {
+  DRAFT
+  PENDING_REVIEW // На модерации у супер-админа
+  PUBLISHED
+  CANCELLED
+  COMPLETED
+}
+
+enum OrganizationVerificationStatus {
+  PENDING // Ожидает проверки
+  APPROVED // Одобрена
+  REJECTED // Отклонена
+}
+
+enum AgendaItemType {
+  KEYNOTE // Основной доклад
+  PRESENTATION // Презентация
+  WORKSHOP // Воркшоп
+  PANEL // Панельная дискуссия
+  NETWORKING // Нетворкинг
+  BREAK // Перерыв
+  OPENING // Открытие
+  CLOSING // Закрытие
+  REGISTRATION // Регистрация
+  MENTORSHIP // Работа с менторами
+  MENTOR_SESSION // Менторские сессии
+  FREE_WORK // Свободная работа
+}
+
+enum QuestionType {
+  TEXT
+  NUMBER
+  SELECT
+  CHECKBOX
+  TEXTAREA
+  FILE_UPLOAD // Загрузка файла(ов) участником
+}
+
+// Статус файла, загруженного участником в ответ на вопрос FILE_UPLOAD.
+// PENDING  — файл загружен до сабмита регистрации (ещё не привязан).
+// ATTACHED — файл закреплён за конкретной регистрацией после сабмита.
+enum RegistrationFileStatus {
+  PENDING
+  ATTACHED
+}
+
+enum QuestionCategory {
+  OPEN // Открытый - развернутый ответ
+  CLOSED // Закрытый - да/нет
+  ALTERNATIVE // Альтернативный - выбор из вариантов
+  RHETORICAL // Риторический - информационный текст
+}
+
+enum RegistrationMode {
+  QUESTIONS // Уточняющие вопросы
+  TEST // Тестирование
+}
+
+enum TestEvaluationType {
+  AUTO_REJECT // Автоматический отбор (не прошел = отклонен)
+  EVALUATION // Для оценки (все допускаются, но видны результаты)
+}
+
+enum RegistrationStatus {
+  PENDING // Ожидает подтверждения
+  APPROVED // Одобрена
+  REJECTED // Отклонена
+  CANCELLED // Отменена
+}
+
+enum AssetGenerationStatus {
+  PENDING
+  PROCESSING
+  READY
+  FAILED
+}
+
+enum TicketArtifactDesign {
+  BRANDED
+  SIMPLE
+}
+
+enum ParticipantRole {
+  PARTICIPANT // Участник
+  SPEAKER // Выступаю/веду
+  MENTOR // Ментор
+}
+
+enum EventRecipientStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum EventRecipientSourceType {
+  USER
+  REGISTRATION
+  SPEAKER
+  MANUAL
+  EMAIL
+}
+
+enum EventRecipientRoleKind {
+  BUILT_IN
+  CUSTOM
+}
+
+enum BuiltInEventRecipientRoleKey {
+  PARTICIPANT
+  SPEAKER
+  STAFF
+  VIP
+  SPONSOR
+  VOLUNTEER
+  ORGANIZER
+  MENTOR
+}
+
+enum EventRecipientRoleAssignmentStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum EventRecipientRoleSourceType {
+  REGISTRATION
+  SPEAKER
+  MANUAL
+  SYSTEM
+}
+
+enum SpeakerInvitationStatus {
+  NONE // Добавлен вручную без приглашения
+  PENDING // Приглашение отправлено, ожидает ответа
+  ACCEPTED // Приглашение принято
+  REJECTED // Приглашение отклонено
+}
+
+enum Currency {
+  RUB
+  USD
+  EUR
+  UZS
+}
+
+enum RentalPlaceStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum VerificationCodeType {
+  EMAIL_VERIFICATION // Подтверждение email
+  PASSWORD_RESET // Сброс пароля
+  EMAIL_CHANGE // Смена email
+}
+
+enum ContactRequestStatus {
+  NEW // Новая заявка
+  IN_PROGRESS // В работе
+  CLOSED // Закрыта
+}
+
+enum ContactRequestType {
+  GENERAL
+  PLACE_RENTAL
+}
+
+enum RentalType {
+  HOURLY // Почасовая аренда
+  DAILY // Суточная аренда
+}
+
+enum Gender {
+  MALE // Мужской
+  FEMALE // Женский
+}
+
+enum UserProfileStatus {
+  WORKER // Работник
+  SCHOOLBOY // Школьник
+  STUDENT // Студент
+}
+
+enum Specialization {
+  LAWYER // Юрист
+  PROGRAMMER // Программист
+  DESIGNER // Дизайнер
+  PHOTOGRAPHER // Фотограф
+  PROJECT_MANAGER // Проджект-менеджер
+  PRODUCT_MANAGER // Продукт-менеджер
+}
+
+enum TagCategory {
+  FORMAT // Конференция, Воркшоп, Вебинар
+  AUDIENCE // Для начинающих, Для профессионалов
+  TOPIC // Технологии, Дизайн, Менеджмент
+  CUSTOM // Кастомные теги организаций
+}
+
+// ==================== BOARD ENUMS ====================
+
+enum BoardRole {
+  OWNER // Владелец доски
+  ADMIN // Администратор
+  MEMBER // Участник
+  VIEWER // Только просмотр
+}
+
+enum TaskType {
+  STORY // История
+  TASK // Задача
+  BUG // Баг
+}
+
+enum TaskPriority {
+  LOW // Низкий
+  MEDIUM // Средний
+  HIGH // Высокий
+  CRITICAL // Критический
+}
+
+enum ActivityType {
+  CREATED // Создано
+  UPDATED // Обновлено
+  MOVED // Перемещено
+  ASSIGNED // Назначено
+  UNASSIGNED // Снято назначение
+  COMMENTED // Комментарий
+  ATTACHMENT_ADDED // Вложение добавлено
+  ATTACHMENT_REMOVED // Вложение удалено
+  CHECKLIST_ADDED // Чеклист добавлен
+  CHECKLIST_UPDATED // Чеклист обновлён
+  TAG_ADDED // Тег добавлен
+  TAG_REMOVED // Тег удалён
+}
+
+// ==================== BLOG ENUMS ====================
+
+enum BlogPostStatus {
+  DRAFT // Черновик
+  PENDING_REVIEW // На модерации у супер-админа
+  APPROVED // Одобрена (готова к публикации)
+  REJECTED // Отклонена
+  PUBLISHED // Опубликована
+}
+
+// ==================== USER ====================
+
+model Account {
+  id          String    @id @default(uuid()) @db.Uuid
+  email       String
+  firstName   String?   @map("first_name")
+  lastName    String?   @map("last_name")
+  displayName String?   @map("display_name")
+  avatarUrl   String?   @map("avatar_url")
+  phone       String?
+  /// Локаль интерфейса ('ru'|'uz'|'en'). NULL = 'ru' (текущее де-факто поведение писем).
+  /// Заполняется при логине/смене языка. Использование: locale писем и fallback
+  /// для пушей без DeviceToken.locale (DATA_MODEL_DELTA §6).
+  locale      String?
+  deletedAt   DateTime? @map("deleted_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  identities              Identity[]
+  memberships             Membership[]
+  platformAdminGrants     PlatformAdminGrant[]
+  platformElevations      PlatformElevation[]
+  refreshTokens           RefreshToken[]
+  deviceTokens            DeviceToken[]
+  notificationPreferences NotificationPreference[]
+  accountNotifications    AccountNotification[]
+
+  @@index([email])
+  @@map("accounts")
+}
+
+model PlatformElevation {
+  id                 String                @id @default(uuid()) @db.Uuid
+  accountId          String                @map("account_id") @db.Uuid
+  requestedByAdminId String                @map("requested_by_admin_id") @db.Uuid
+  approvedByAdminId  String?               @map("approved_by_admin_id") @db.Uuid
+  organizationId     String?               @map("organization_id") @db.Uuid
+  mode               PlatformElevationMode @default(READ)
+  tokenHash          String?               @unique @map("token_hash")
+  reason             String
+  expiresAt          DateTime              @map("expires_at")
+  revokedAt          DateTime?             @map("revoked_at")
+  createdAt          DateTime              @default(now()) @map("created_at")
+  approvedAt         DateTime?             @map("approved_at")
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId, expiresAt])
+  @@index([organizationId])
+  @@map("platform_elevations")
+}
+
+model Identity {
+  id           String       @id @default(uuid()) @db.Uuid
+  accountId    String       @map("account_id") @db.Uuid
+  provider     AuthProvider
+  email        String
+  providerId   String?      @map("provider_id")
+  passwordHash String?      @map("password_hash")
+  actorType    UserType     @map("actor_type")
+  actorId      String       @map("actor_id") @db.Uuid
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([actorType, actorId])
+  @@index([accountId])
+  @@index([email])
+  @@map("identities")
+}
+
+model Membership {
+  id                   String         @id @default(uuid()) @db.Uuid
+  accountId            String         @map("account_id") @db.Uuid
+  organizationId       String         @map("organization_id") @db.Uuid
+  organizationMemberId String?        @map("organization_member_id") @db.Uuid
+  /// Canonical role projection. The composite relation makes a cross-tenant
+  /// role reference impossible at the database boundary. Nullable during the
+  /// additive backfill/dual-read window.
+  roleId               String?        @map("role_id") @db.Uuid
+  kind                 MembershipKind
+  roleName             String?        @map("role_name")
+  permissions          String[]       @default([])
+  hiddenAt             DateTime?      @map("hidden_at")
+  createdAt            DateTime       @default(now()) @map("created_at")
+  updatedAt            DateTime       @updatedAt @map("updated_at")
+
+  account            Account             @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  organization       Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationMember OrganizationMember? @relation(fields: [organizationMemberId], references: [id], onDelete: Cascade)
+  role               OrganizationRole?   @relation("MembershipRole", fields: [organizationId, roleId], references: [organizationId, id])
+
+  @@unique([accountId, organizationId, kind])
+  @@unique([organizationMemberId])
+  @@index([accountId])
+  @@index([organizationId])
+  @@index([organizationId, roleId])
+  @@map("memberships")
+}
+
+model PlatformAdminGrant {
+  id           String       @id @default(uuid()) @db.Uuid
+  accountId    String       @map("account_id") @db.Uuid
+  superAdminId String       @map("super_admin_id") @db.Uuid
+  role         PlatformRole @default(SUPER_ADMIN)
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  account    Account    @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  superAdmin SuperAdmin @relation(fields: [superAdminId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, superAdminId])
+  @@index([accountId])
+  @@index([superAdminId])
+  @@map("platform_admin_grants")
+}
+
+model User {
+  id              String       @id @default(uuid()) @db.Uuid
+  email           String       @unique
+  passwordHash    String?      @map("password_hash")
+  firstName       String?      @map("first_name")
+  lastName        String?      @map("last_name")
+  avatarUrl       String?      @map("avatar_url")
+  phone           String?
+  location        String?
+  bio             String?      @db.Text
+  authProvider    AuthProvider @default(EMAIL) @map("auth_provider")
+  providerId      String?      @map("provider_id")
+  isEmailVerified Boolean      @default(false) @map("is_email_verified")
+
+  // Настройки приватности
+  isPublicProfile Boolean @default(true) @map("is_public_profile") // Публичный профиль
+  showEmail       Boolean @default(false) @map("show_email") // Показывать email другим пользователям
+  showPhone       Boolean @default(false) @map("show_phone") // Показывать телефон другим пользователям
+
+  // Онбординг
+  isOnboardingCompleted Boolean @default(false) @map("is_onboarding_completed") // Завершен ли онбординг
+
+  // Доп. поля профиля (popup «Заполните доп. поля» для пользователя)
+  gender               Gender? // Муж/Жен
+  dateOfBirth          DateTime?          @map("date_of_birth") @db.Date
+  region               String?            @db.VarChar(150) // Регион Узбекистана
+  languages            String[]           @default([]) // Языки (несколько)
+  profileStatus        UserProfileStatus? @map("profile_status") // Работник/школьник/студент
+  workOrStudyPlace     String?            @map("work_or_study_place") @db.VarChar(500) // Где работает или учится
+  skills               String[]           @default([]) // Навыки: макс. 3 из списка
+  specialization       Specialization? // Одна из: Юрист, программист, ...
+  shortBio             String?            @map("short_bio") @db.VarChar(150) // Коротко о себе (150 символов)
+  profileInfoCompleted Boolean            @default(false) @map("profile_info_completed") // Popup не показывать
+
+  // Соцсети и ссылки (опционально)
+  linkedinUrl  String? @map("linkedin_url")
+  instagramUrl String? @map("instagram_url")
+  facebookUrl  String? @map("facebook_url")
+  websiteUrl   String? @map("website_url")
+
+  // Архивация (soft delete) супер-админом. deletedAt — момент архивации.
+  deletedAt     DateTime? @map("deleted_at")
+  archivedById  String?   @map("archived_by_id") @db.Uuid // SuperAdmin.id, кто архивировал
+  archiveReason String?   @map("archive_reason") @db.Text
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  registrations          Registration[]
+  userCertificates       UserCertificate[]
+  savedArticles          SavedArticle[]
+  speakers               Speaker[]
+  eventComments          EventComment[]
+  commentLikes           EventCommentLike[]
+  savedEvents            SavedEvent[]
+  followingOrganizations UserFollowing[]
+  contactRequests        ContactRequest[]   @relation("UserContactRequests")
+  eventRecipients        EventRecipient[]
+
+  // Blog relations
+  blogPostLikes        BlogPostLike[]
+  blogPostComments     BlogPostComment[]
+  blogPostCommentLikes BlogPostCommentLike[]
+  savedBlogPosts       SavedBlogPost[]
+
+  organizationInvites OrganizationInvite[]
+
+  @@map("users")
+}
+
+// ==================== ORGANIZATION ====================
+
+model Organization {
+  id              String       @id @default(uuid()) @db.Uuid
+  email           String       @unique
+  passwordHash    String?      @map("password_hash")
+  name            String
+  companyName     String       @map("company_name")
+  translations    Json         @default("{}")
+  translationMeta Json         @default("{}") @map("translation_meta")
+  inn             String?      @unique // ИНН организации (для входа сотрудников)
+  description     String?      @db.Text
+  phone           String?
+  address         String? // Адрес организации
+  website         String? // Веб-сайт организации
+  logoUrl         String?      @map("logo_url")
+  authProvider    AuthProvider @default(EMAIL) @map("auth_provider")
+  providerId      String?      @map("provider_id")
+  isEmailVerified Boolean      @default(false) @map("is_email_verified")
+
+  // Верификация организации супер-админом
+  verificationStatus OrganizationVerificationStatus @default(PENDING) @map("verification_status")
+  rejectionReason    String?                        @map("rejection_reason") @db.Text
+  verifiedAt         DateTime?                      @map("verified_at")
+
+  // Онбординг
+  isOnboardingCompleted Boolean @default(false) @map("is_onboarding_completed") // Завершен ли онбординг
+
+  // Доп. поля компании (popup «Заполните доп. поля» — только для организатора, не для сотрудников)
+  industry             String? @db.VarChar(100) // Отрасль
+  companySize          Int?    @map("company_size") // Размер компании (число сотрудников)
+  companyInfoCompleted Boolean @default(false) @map("company_info_completed") // Доп. поля заполнены — popup не показывать
+  placesFeatureEnabled Boolean @default(false) @map("places_feature_enabled") // Доступна ли витрина арендуемых площадок
+
+  // Брендинг билетов (hex #RRGGBB). Используются на билете и в email-шаблонах.
+  brandColor  String? @map("brand_color")
+  accentColor String? @map("accent_color")
+
+  // Архивация (soft delete) супер-админом. deletedAt — момент архивации.
+  deletedAt     DateTime? @map("deleted_at")
+  archivedById  String?   @map("archived_by_id") @db.Uuid // SuperAdmin.id, кто архивировал
+  archiveReason String?   @map("archive_reason") @db.Text
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  members               OrganizationMember[]
+  memberships           Membership[]
+  invites               OrganizationInvite[]
+  roles                 OrganizationRole[]
+  events                Event[]
+  boards                Board[]
+  followers             UserFollowing[]
+  contactRequests       ContactRequest[]     @relation("OrganizationContactRequests")
+  customTags            EventTag[]
+  blogPosts             BlogPost[]
+  rentalPlaces          RentalPlace[]
+  sentContactRequests   ContactRequest[]     @relation("RequesterOrganizationContactRequests")
+  authoredEventComments EventComment[]       @relation("OrganizationEventComments")
+
+  // Приостановка платформенными операторами (D-17/S-8/E-17; решение D-1 группы D).
+  // FK-less suspendedById (SuperAdmin.id) — прецедент archivedById.
+  suspendedAt     DateTime? @map("suspended_at")
+  suspendedById   String?   @map("suspended_by_id") @db.Uuid
+  suspendedReason String?   @map("suspended_reason")
+
+  // Монетизация (D-9, D-5)
+  billingOrders         Order[]
+  planPurchases         PlanPurchase[]
+  creditConsumptions    EventCreditConsumption[]
+  planCreditAdjustments PlanCreditAdjustment[]
+  entitlementOverrides  EntitlementOverride[]
+  accessOverrides       OrganizationAccessOverride[]
+  payouts               Payout[]
+  adOrders              AdOrder[]
+  usageEvents           UsageEvent[]
+  usageCounters         UsageCounter[]
+  coinLedgerEntries     CoinLedgerEntry[]
+  notifications         Notification[]
+
+  @@index([verificationStatus])
+  @@map("organizations")
+}
+
+// ==================== NOTIFICATIONS ====================
+
+enum NotificationType {
+  REGISTRATION_CREATED // Новая заявка на событие организации
+  REGISTRATION_APPROVED // Заявка одобрена
+  REGISTRATION_REJECTED // Заявка отклонена
+  EVENT_PUBLISHED // Событие прошло модерацию
+  EVENT_REJECTED // Событие отклонено модерацией
+  MEMBER_JOINED // Сотрудник принял приглашение
+  ORG_VERIFIED // Организация подтверждена
+  ORG_VERIFICATION_REJECTED // Верификация организации отклонена
+  // --- Программа уведомлений (docs/notifications, CONTRACT_DIFF §5) ---
+  EVENT_SUBMITTED // MOD-01: событие подано на модерацию
+  EVENT_CHANGES_REQUESTED // MOD-04 kind=changes_requested (EVENT_REJECTED остаётся для kind=rejected)
+  REGISTRATION_FIRST // REG-20: первая регистрация на событие
+  CAPACITY_THRESHOLD // REG-21: заполненность (payload {threshold: 50|80|100})
+  TICKET_REFUND // REG-23: возврат билета
+  REGISTRATION_CLOSED // CLS-03/CLS-04: регистрация закрыта (payload с итогами)
+  EVENT_SUMMARY // SUM-02: итоги события
+  MEMBER_INVITE_DECLINED // Приглашённый отказался вступить в команду (payload: personName, roleName, reason?)
+}
+
+/// Уведомление в центре уведомлений организации.
+///
+/// Хранит ТИП и структурированный payload, а НЕ готовую фразу. Лента активности
+/// на дашборде складывает description вида «+1 регистрация на …» прямо в БД —
+/// из-за этого мобильный клиент вынужден её выбрасывать и пересобирать текст
+/// заново, иначе узбекский и английский интерфейс показывают русский. Здесь
+/// фразу собирает клиент из type + payload, на своём языке.
+model Notification {
+  id             String  @id @default(uuid()) @db.Uuid
+  organizationId String  @map("organization_id") @db.Uuid
+  /// Адресат. null = уведомление всей организации: его видит любой сотрудник.
+  memberId       String? @map("member_id") @db.Uuid
+
+  type NotificationType
+
+  /// На что ссылается уведомление — чтобы открыть нужный экран по тапу.
+  entityType String? @map("entity_type")
+  entityId   String? @map("entity_id") @db.Uuid
+
+  /// Подстановки для локализованной строки (название события, имя человека).
+  /// Никаких готовых предложений.
+  payload Json?
+
+  readAt    DateTime? @map("read_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  organization Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  member       OrganizationMember? @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  // Лента читается «свежие сверху»; счётчик непрочитанных — тем же ключом.
+  @@index([organizationId, createdAt])
+  @@index([organizationId, readAt])
+  @@map("notifications")
+}
+
+// ==================== ORGANIZATION MEMBER ====================
+
+model OrganizationMember {
+  id             String  @id @default(uuid()) @db.Uuid
+  organizationId String  @map("organization_id") @db.Uuid
+  email          String
+  passwordHash   String? @map("password_hash")
+  firstName      String  @map("first_name")
+  lastName       String  @map("last_name")
+  phone          String?
+  position       String?
+  department     String?
+  avatarUrl      String? @map("avatar_url")
+  bio            String? @db.Text
+  location       String?
+
+  // Настройки приватности
+  isPublicProfile Boolean @default(true) @map("is_public_profile")
+  showEmail       Boolean @default(false) @map("show_email")
+  showPhone       Boolean @default(false) @map("show_phone")
+
+  // Онбординг
+  isOnboardingCompleted Boolean @default(false) @map("is_onboarding_completed") // Завершен ли онбординг
+
+  roleId          String       @map("role_id") @db.Uuid
+  status          MemberStatus @default(INVITED)
+  invitationSent  Boolean      @default(false) @map("invitation_sent")
+  invitationToken String?      @unique @map("invitation_token")
+  tokenExpiresAt  DateTime?    @map("token_expires_at")
+  deletedAt       DateTime?    @map("deleted_at")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  role         OrganizationRole @relation(fields: [organizationId, roleId], references: [organizationId, id])
+  membership   Membership?
+
+  permissions MemberPermission[]
+
+  // Board relations
+  createdBoards       Board[]               @relation("BoardCreator")
+  boardMemberships    BoardMember[]
+  assignedTasks       BoardTaskAssignee[]   @relation("TaskAssignee")
+  assignedByTasks     BoardTaskAssignee[]   @relation("TaskAssignedBy")
+  taskComments        BoardTaskComment[]
+  uploadedAttachments BoardTaskAttachment[]
+  completedItems      BoardChecklistItem[]
+  taskActivities      BoardTaskActivity[]
+  addedBoardMembers   BoardMember[]         @relation("BoardMemberAddedBy")
+
+  // Blog relations — posts where this member is set as the byline author
+  // (Person, not Organization). Backs BlogPosting.author = Person JSON-LD
+  // on the public site for E-E-A-T.
+  authoredBlogPosts BlogPost[]     @relation("BlogPostAuthor")
+  notifications     Notification[]
+
+  @@unique([organizationId, email])
+  @@map("organization_members")
+}
+
+// ==================== ORGANIZATION ROLE ====================
+
+model OrganizationRole {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  name           String
+  isSystem       Boolean  @default(false) @map("is_system")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  organization Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  permissions  RolePermission[]
+  members      OrganizationMember[]
+  memberships  Membership[]         @relation("MembershipRole")
+  invites      OrganizationInvite[]
+
+  @@unique([organizationId, name])
+  @@unique([organizationId, id])
+  @@map("organization_roles")
+}
+
+// ==================== ORGANIZATION INVITE ====================
+
+/// Приглашение пользователя в организацию. В отличие от устаревшей
+/// схемы (invitationToken прямо на OrganizationMember) это самостоятельная
+/// сущность: один Account/User может состоять в нескольких организациях,
+/// а приглашение существует независимо от staff-записи и хранит токен в
+/// виде хэша. См. accept-flow в organizations/invites.
+model OrganizationInvite {
+  id             String       @id @default(uuid()) @db.Uuid
+  organizationId String       @map("organization_id") @db.Uuid
+  /// Нормализованный (trim + lowercase) email приглашаемого.
+  email          String
+  /// Снимок: существующий публичный User с этим email на момент создания.
+  /// Информативно — accept всё равно сверяет email текущего пользователя.
+  userId         String?      @map("user_id") @db.Uuid
+  roleId         String       @map("role_id") @db.Uuid
+  status         InviteStatus @default(PENDING)
+  /// sha256(rawToken) в hex. Сырой токен живёт только в письме/ссылке.
+  tokenHash      String       @unique @map("token_hash")
+  expiresAt      DateTime     @map("expires_at")
+
+  // Метаданные приглашённого — используются при создании staff-профиля на accept.
+  firstName  String? @map("first_name")
+  lastName   String? @map("last_name")
+  position   String?
+  department String?
+
+  // Жизненный цикл / аудит
+  acceptedAt       DateTime? @map("accepted_at")
+  acceptedByUserId String?   @map("accepted_by_user_id") @db.Uuid
+  acceptedMemberId String?   @map("accepted_member_id") @db.Uuid
+  revokedAt        DateTime? @map("revoked_at")
+  /// Отказ приглашённого: когда и (необязательно) почему.
+  declinedAt       DateTime? @map("declined_at")
+  declineReason    String?   @map("decline_reason")
+  createdByUserId  String?   @map("created_by_user_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  role         OrganizationRole @relation(fields: [roleId], references: [id])
+  user         User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+  @@index([email])
+  @@index([userId])
+  @@map("organization_invites")
+}
+
+/// Personal invitation to a PRIVATE event. The raw token lives only in the
+/// emailed link (`?inviteCode=<token>`); a PENDING invitation opens the event
+/// page and admits exactly one registration, which flips it to ACCEPTED.
+/// Resend rotates the token, so the previously emailed link stops working.
+model EventInvitation {
+  id               String       @id @default(uuid()) @db.Uuid
+  eventId          String       @map("event_id") @db.Uuid
+  /// Normalized (trim + lowercase) recipient email.
+  email            String
+  status           InviteStatus @default(PENDING)
+  /// sha256(rawToken) hex.
+  tokenHash        String       @unique @map("token_hash")
+  lastSentAt       DateTime     @map("last_sent_at")
+  sendCount        Int          @default(1) @map("send_count")
+  invitedByUserId  String?      @map("invited_by_user_id") @db.Uuid
+  acceptedAt       DateTime?    @map("accepted_at")
+  acceptedByUserId String?      @map("accepted_by_user_id") @db.Uuid
+  registrationId   String?      @map("registration_id") @db.Uuid
+  revokedAt        DateTime?    @map("revoked_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, email])
+  @@map("event_invitations")
+}
+
+// ==================== PERMISSION ====================
+
+model Permission {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique
+  name        String
+  description String?
+  category    String
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  rolePermissions   RolePermission[]
+  memberPermissions MemberPermission[]
+
+  @@map("permissions")
+}
+
+// ==================== ROLE PERMISSION ====================
+
+model RolePermission {
+  roleId       String @map("role_id") @db.Uuid
+  permissionId String @map("permission_id") @db.Uuid
+
+  role       OrganizationRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission       @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+// ==================== MEMBER PERMISSION (дополнительные права) ====================
+
+model MemberPermission {
+  memberId     String @map("member_id") @db.Uuid
+  permissionId String @map("permission_id") @db.Uuid
+
+  member     OrganizationMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  permission Permission         @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([memberId, permissionId])
+  @@map("member_permissions")
+}
+
+// ==================== SUPER ADMIN ====================
+
+model SuperAdmin {
+  id           String    @id @default(uuid()) @db.Uuid
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  name         String
+  deletedAt    DateTime? @map("deleted_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  platformAdminGrants PlatformAdminGrant[]
+  deletedEvents       Event[]
+  deletedBlogPosts    BlogPost[]
+
+  @@map("super_admins")
+}
+
+// ==================== REFRESH TOKEN (используется как сессия) ====================
+
+model RefreshToken {
+  id                  String    @id @default(uuid()) @db.Uuid
+  token               String    @unique
+  actorType           UserType  @map("actor_type")
+  userAgent           String?   @map("user_agent")
+  ipAddress           String?   @map("ip_address")
+  lastUsedAt          DateTime  @default(now()) @map("last_used_at")
+  familyId            String    @default(uuid()) @map("family_id") @db.Uuid
+  consumedAt          DateTime? @map("consumed_at")
+  revokedAt           DateTime? @map("revoked_at")
+  replacedByTokenHash String?   @map("replaced_by_token_hash")
+  expiresAt           DateTime  @map("expires_at")
+  createdAt           DateTime  @default(now()) @map("created_at")
+
+  accountId String @map("account_id") @db.Uuid
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId])
+  @@index([familyId])
+  @@map("refresh_tokens")
+}
+
+// ==================== EVENT ====================
+
+model Event {
+  id                  String          @id @default(uuid()) @db.Uuid
+  organizationId      String          @map("organization_id") @db.Uuid
+  rentalPlaceId       String?         @map("rental_place_id") @db.Uuid
+  slug                String          @unique // SEO-friendly URL slug
+  title               String
+  description         Json? // BlockNote document JSON (Block[])
+  shortDescription    String?         @map("short_description")
+  translations        Json            @default("{}")
+  translationMeta     Json            @default("{}") @map("translation_meta")
+  richTranslations    Json            @default("{}") @map("rich_translations")
+  richTranslationMeta Json            @default("{}") @map("rich_translation_meta")
+  coverImage          String?         @map("cover_image")
+  type                EventType       @default(FREE)
+  accessType          EventAccessType @default(OPEN) @map("access_type")
+  format              EventFormat
+  status              EventStatus     @default(DRAFT)
+
+  // Даты
+  startDate            DateTime  @map("start_date")
+  endDate              DateTime  @map("end_date")
+  registrationDeadline DateTime? @map("registration_deadline")
+  /// IANA-таймзона события ('Asia/Tashkent'). NULL = платформенный дефолт
+  /// (PlatformSetting 'platform.timezone', сид 'Asia/Tashkent'). Нужна цепочкам
+  /// REM/CLS/SUM: «T−24h в TZ события» и quiet hours (OQ-18: UI не делаем).
+  timezone             String?
+
+  // Место проведения
+  venue     String? // Название места (для offline/hybrid)
+  address   String? // Адрес (для offline/hybrid)
+  city      String?
+  latitude  Decimal? @db.Decimal(9, 6) // Широта (для карты, напр. Yandex Maps)
+  longitude Decimal? @db.Decimal(9, 6) // Долгота
+  placeId   String?  @map("place_id") // ID места в Yandex (опционально)
+  onlineUrl String?  @map("online_url") // Ссылка (для online/hybrid)
+
+  // Стоимость
+  price    Decimal? @db.Decimal(10, 2)
+  currency Currency @default(UZS)
+
+  // Настройки
+  maxParticipants Int?    @map("max_participants")
+  inviteCode      String? @unique @map("invite_code") // Код приглашения для INVITE_ONLY событий
+
+  // Ручной переключатель регистрации (имеет приоритет над автологикой: дедлайн, капасити)
+  registrationOpen Boolean @default(true) @map("registration_open")
+
+  // Модерация
+  rejectionReason String? @map("rejection_reason") @db.Text // Причина отклонения модератором
+
+  /// Момент ПЕРВОЙ публикации. Не сбрасывается при возврате в DRAFT/повторной
+  /// модерации: это отметка «событие когда-то было в эфире». По ней организатор
+  /// может завершить прошедшее событие, даже если оно уехало в черновик.
+  publishedAt DateTime? @map("published_at")
+
+  // Топовое событие (отмечается супер-админом)
+  isFeatured Boolean @default(false) @map("is_featured")
+
+  // Счётчик публичных просмотров (инкремент при открытии публичной страницы по slug)
+  viewsCount Int @default(0) @map("views_count")
+
+  // Удаление супер-админом (soft delete)
+  deletedAt             DateTime? @map("deleted_at")
+  deletedBySuperAdminId String?   @map("deleted_by_super_admin_id") @db.Uuid
+  deletionReason        String?   @map("deletion_reason") @db.Text
+
+  // Режим регистрации и тестирование
+  registrationMode   RegistrationMode    @default(QUESTIONS) @map("registration_mode")
+  testEvaluationType TestEvaluationType? @map("test_evaluation_type")
+  minTestScore       Int?                @map("min_test_score") // Минимальный балл для прохождения
+  maxTestScore       Int?                @map("max_test_score") // Максимально возможный балл (авторасчет)
+
+  // Настройки комментариев
+  commentsEnabled Boolean @default(true) @map("comments_enabled") // Разрешены ли комментарии
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  organization                     Organization                   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  rentalPlace                      RentalPlace?                   @relation(fields: [rentalPlaceId], references: [id], onDelete: SetNull)
+  // Тематики события (несколько на событие)
+  categories                       EventCategory[]                @relation("EventCategories")
+  deletedBySuperAdmin              SuperAdmin?                    @relation(fields: [deletedBySuperAdminId], references: [id], onDelete: SetNull)
+  speakers                         Speaker[]
+  agendaItems                      AgendaItem[]
+  registrationQuestions            RegistrationQuestion[]
+  registrations                    Registration[]
+  registrationFileUploads          RegistrationFileUpload[]
+  artifactRecipients               EventRecipient[]
+  artifactRecipientSources         EventRecipientSource[]
+  artifactRecipientRoles           EventRecipientRole[]
+  artifactRecipientRoleAssignments EventRecipientRoleAssignment[]
+  boards                           Board[]
+  comments                         EventComment[]
+  savedByUsers                     SavedEvent[]
+  tags                             EventTagAssignment[]
+  collections                      EventCollectionItem[]
+  certificateTemplates             CertificateTemplate[]
+  certificates                     Certificate[]
+  badgeTemplates                   BadgeTemplate[]
+  rooms                            EventRoom[]
+  checkpoints                      EventCheckpoint[]
+  ticketOrders                     Order[]                        @relation("EventTicketOrders")
+  adPlacements                     AdOrder[]
+  invitations                      EventInvitation[]
+
+  @@index([organizationId])
+  @@index([status])
+  @@index([startDate])
+  @@index([isFeatured, startDate]) // Для сортировки топовых событий
+  @@index([slug])
+  @@index([rentalPlaceId])
+  @@map("events")
+}
+
+// ==================== RENTAL PLACE ====================
+
+model RentalPlace {
+  id                  String            @id @default(uuid()) @db.Uuid
+  organizationId      String            @map("organization_id") @db.Uuid
+  slug                String            @unique
+  title               String
+  description         Json? // BlockNote document JSON (Block[])
+  shortDescription    String?           @map("short_description") @db.VarChar(500)
+  translations        Json              @default("{}")
+  translationMeta     Json              @default("{}") @map("translation_meta")
+  richTranslations    Json              @default("{}") @map("rich_translations")
+  richTranslationMeta Json              @default("{}") @map("rich_translation_meta")
+  status              RentalPlaceStatus @default(DRAFT)
+
+  pricePerHour     Decimal? @map("price_per_hour") @db.Decimal(10, 2)
+  pricePerDay      Decimal? @map("price_per_day") @db.Decimal(10, 2)
+  currency         Currency @default(UZS)
+  hourlyConditions String?  @map("hourly_conditions") @db.Text
+  dailyConditions  String?  @map("daily_conditions") @db.Text
+
+  capacity     Int?
+  amenities    String[] @default([])
+  address      String   @db.VarChar(500)
+  addressNotes String?  @map("address_notes") @db.VarChar(500)
+  city         String?  @db.VarChar(100)
+  latitude     Decimal  @db.Decimal(9, 6)
+  longitude    Decimal  @db.Decimal(9, 6)
+  placeId      String?  @map("place_id") @db.VarChar(255)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  organization    Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  images          RentalPlaceImage[]
+  events          Event[]
+  contactRequests ContactRequest[]
+
+  @@index([organizationId])
+  @@index([status])
+  @@index([city])
+  @@index([latitude, longitude])
+  @@map("rental_places")
+}
+
+model RentalPlaceImage {
+  id            String   @id @default(uuid()) @db.Uuid
+  rentalPlaceId String   @map("rental_place_id") @db.Uuid
+  url           String
+  sortOrder     Int      @default(0) @map("sort_order")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  rentalPlace RentalPlace @relation(fields: [rentalPlaceId], references: [id], onDelete: Cascade)
+
+  @@index([rentalPlaceId, sortOrder])
+  @@map("rental_place_images")
+}
+
+// ==================== SPEAKER ====================
+
+model Speaker {
+  id      String @id @default(uuid()) @db.Uuid
+  eventId String @map("event_id") @db.Uuid
+
+  // === Связь с User (для приглашений) ===
+  userId String? @map("user_id") @db.Uuid
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  // === Данные спикера (используются если userId = null) ===
+  firstName    String  @map("first_name")
+  lastName     String  @map("last_name")
+  position     String
+  company      String?
+  bio          String? @db.Text
+  avatarUrl    String? @map("avatar_url")
+  linkedinUrl  String? @map("linkedin_url")
+  instagramUrl String? @map("instagram_url")
+  facebookUrl  String? @map("facebook_url")
+  websiteUrl   String? @map("website_url")
+
+  // === Локализация ===
+  // translations: { position?: { ru?, uz?, en? }, company?: {…}, bio?: {…} }
+  // Скалярные position/company/bio выше — fallback для legacy data и mail templates.
+  translations    Json @default("{}")
+  translationMeta Json @default("{}") @map("translation_meta")
+
+  // === Система приглашений ===
+  invitationStatus SpeakerInvitationStatus @default(NONE) @map("invitation_status")
+  invitationToken  String?                 @unique @map("invitation_token")
+  tokenExpiresAt   DateTime?               @map("token_expires_at")
+  invitedEmail     String?                 @map("invited_email")
+  rejectionReason  String?                 @map("rejection_reason") @db.Text
+
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  event       Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  agendaItems AgendaItem[] @relation("AgendaSpeakers")
+
+  @@index([eventId])
+  @@index([userId])
+  @@index([invitationToken])
+  @@index([invitationStatus])
+  @@index([invitedEmail])
+  @@map("speakers")
+}
+
+// ==================== AGENDA ITEM ====================
+
+model AgendaItem {
+  id          String         @id @default(uuid()) @db.Uuid
+  eventId     String         @map("event_id") @db.Uuid
+  title       String
+  description String?        @db.Text
+  type        AgendaItemType
+  date        DateTime       @db.Date // День проведения (для многодневных мероприятий)
+  startTime   DateTime       @map("start_time") @db.Time
+  duration    Int // Длительность в минутах
+  location    String? // Локация (для гибридных событий)
+  materials   String[] // Массив ссылок на материалы (презентации, документы)
+  sortOrder   Int            @default(0) @map("sort_order")
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+
+  // === Локализация ===
+  // translations: { title?: { ru?, uz?, en? }, description?: {…}, location?: {…} }
+  // Скалярные title/description/location выше — fallback для legacy data.
+  translations    Json @default("{}")
+  translationMeta Json @default("{}") @map("translation_meta")
+
+  // materialLabels: { "<material-url>": { ru?, uz?, en? } } — локализованные
+  // подписи к ссылкам/файлам в materials[]. При удалении URL ключ чистится.
+  materialLabels Json @default("{}") @map("material_labels")
+
+  // === Per-event room (зал) ===
+  // FK на EventRoom. Заменяет text-match по location: agenda items внутри
+  // одного зала валидируются по roomId. location выше остаётся как scalar
+  // снапшот (для писем, PDF, поиска и legacy clients) и синхронизируется
+  // с room.name при записи.
+  roomId String?    @map("room_id") @db.Uuid
+  room   EventRoom? @relation(fields: [roomId], references: [id], onDelete: SetNull)
+
+  event    Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  speakers Speaker[] @relation("AgendaSpeakers")
+
+  @@index([eventId])
+  @@index([date])
+  @@index([roomId])
+  @@map("agenda_items")
+}
+
+// ==================== EVENT ROOM (зал/сцена внутри события) ====================
+// Per-event список залов. Каждый AgendaItem может ссылаться на конкретный
+// зал; UI на public/workspace фильтрует agenda через табы по залам.
+// Не путать с RentalPlace (org-scoped catalog с прайсингом).
+model EventRoom {
+  id           String   @id @default(uuid()) @db.Uuid
+  eventId      String   @map("event_id") @db.Uuid
+  name         String // scalar fallback (computed via pickFallbackTranslation)
+  translations Json     @default("{}") // { name?: { ru?, uz?, en? } }
+  sortOrder    Int      @default(0) @map("sort_order")
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  event       Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  agendaItems AgendaItem[]
+
+  @@unique([eventId, name])
+  @@index([eventId])
+  @@map("event_rooms")
+}
+
+// ==================== REGISTRATION QUESTION ====================
+
+model RegistrationQuestion {
+  id         String       @id @default(uuid()) @db.Uuid
+  eventId    String       @map("event_id") @db.Uuid
+  question   String
+  type       QuestionType
+  isRequired Boolean      @default(false) @map("is_required")
+  options    String[] // Варианты ответов для SELECT и CHECKBOX
+  sortOrder  Int          @default(0) @map("sort_order")
+
+  // Категоризация вопросов
+  category QuestionCategory @default(OPEN)
+
+  // Для тестов
+  points         Int      @default(0) // Вес вопроса в баллах (0 = не учитывается)
+  correctAnswer  String?  @map("correct_answer") @db.Text // Правильный ответ для TEXT/TEXTAREA/NUMBER
+  correctOptions String[] @default([]) @map("correct_options") // Правильные варианты для SELECT/CHECKBOX
+
+  // Для риторических вопросов
+  informationalText String? @map("informational_text") @db.Text // Текст для отображения
+
+  // Для вопросов типа FILE_UPLOAD: настройки поля загрузки файла.
+  // Форма: { description?, template?: { url, name, size, mimeType },
+  //   maxFileSizeMb, allowedFileTypes: string[], allowMultipleFiles, maxFiles }.
+  // null для всех остальных типов вопросов.
+  fileUploadConfig Json? @map("file_upload_config")
+
+  // === Локализация ===
+  // translations: { question?: { ru?, uz?, en? }, informationalText?: {...},
+  //   correctAnswer?: {...} } — для plain-text полей.
+  // optionsTranslations: { ru?: string[], uz?: string[], en?: string[] } —
+  //   массив вариантов под каждую локаль (длина совпадает с options[]).
+  // Скаляры question/informationalText/correctAnswer/options/correctOptions
+  // выше — fallback для legacy data; correctOptions всегда сравнивается
+  // против scalar options[] (server-side answer evaluation не зависит от
+  // того, на какой локали пользователь ответил).
+  translations        Json @default("{}")
+  translationMeta     Json @default("{}") @map("translation_meta")
+  optionsTranslations Json @default("{}") @map("options_translations")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  event       Event                    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  answers     QuestionAnswer[]
+  fileUploads RegistrationFileUpload[]
+
+  @@index([eventId])
+  @@map("registration_questions")
+}
+
+// ==================== REGISTRATION ====================
+
+model Registration {
+  id              String             @id @default(uuid()) @db.Uuid
+  eventId         String             @map("event_id") @db.Uuid
+  userId          String             @map("user_id") @db.Uuid
+  status          RegistrationStatus @default(PENDING)
+  role            ParticipantRole    @default(PARTICIPANT) // Роль участника (Участник, Спикер, Ментор)
+  qrCode          String?            @unique @map("qr_code") // Уникальный код для QR
+  rejectionReason String?            @map("rejection_reason")
+
+  // E-ticket: человекочитаемый номер билета (EVF-YYMMDD-XXXXXX), идемпотентен
+  ticketNumber      String?   @unique @map("ticket_number")
+  ticketIssuedAt    DateTime? @map("ticket_issued_at")
+  // QR signing: версия payload для revoke без ротации глобального секрета
+  qrPayloadVersion  Int       @default(1) @map("qr_payload_version")
+  qrSecretRotatedAt DateTime? @map("qr_secret_rotated_at")
+
+  // Даты для календаря
+  travelStartDate DateTime? @map("travel_start_date") @db.Date // Начало перелёта/дороги
+  travelEndDate   DateTime? @map("travel_end_date") @db.Date // Конец перелёта/дороги
+  preparationDays Int       @default(0) @map("preparation_days") // Количество дней на подготовку до события
+
+  // Результаты тестирования
+  testScore       Int?      @map("test_score") // Набранные баллы
+  testMaxScore    Int?      @map("test_max_score") // Максимально возможные баллы
+  testPassed      Boolean?  @map("test_passed") // Прошел ли тест
+  testCompletedAt DateTime? @map("test_completed_at") // Когда завершил тест
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  event       Event                    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user        User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  answers     QuestionAnswer[]
+  ticketOrder Order?                   @relation("RegistrationTicketOrder")
+  fileUploads RegistrationFileUpload[]
+  attendances Attendance[]
+  certificate Certificate?
+  tickets     TicketArtifact[]
+
+  @@unique([eventId, userId])
+  @@index([eventId])
+  @@index([userId])
+  @@index([status])
+  @@index([role])
+  // Hot path: "approved/pending registrations for this event" (eventId + status).
+  @@index([eventId, status])
+  @@map("registrations")
+}
+
+// ==================== EVENT ARTIFACT RECIPIENTS ====================
+
+model EventRecipient {
+  id              String               @id @default(uuid()) @db.Uuid
+  eventId         String               @map("event_id") @db.Uuid
+  userId          String?              @map("user_id") @db.Uuid
+  displayName     String               @map("display_name")
+  firstName       String?              @map("first_name")
+  lastName        String?              @map("last_name")
+  email           String?
+  emailNormalized String?              @map("email_normalized")
+  status          EventRecipientStatus @default(ACTIVE)
+  createdAt       DateTime             @default(now()) @map("created_at")
+  updatedAt       DateTime             @updatedAt @map("updated_at")
+  archivedAt      DateTime?            @map("archived_at")
+
+  event           Event                          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user            User?                          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  sources         EventRecipientSource[]
+  roleAssignments EventRecipientRoleAssignment[]
+  certificates    Certificate[]
+
+  @@unique([eventId, userId])
+  @@index([eventId])
+  @@index([eventId, emailNormalized])
+  @@index([userId])
+  @@map("event_recipients")
+}
+
+model EventRecipientSource {
+  id            String                   @id @default(uuid()) @db.Uuid
+  eventId       String                   @map("event_id") @db.Uuid
+  recipientId   String                   @map("recipient_id") @db.Uuid
+  sourceType    EventRecipientSourceType @map("source_type")
+  sourceId      String?                  @map("source_id") @db.Uuid
+  emailSnapshot String?                  @map("email_snapshot")
+  nameSnapshot  String?                  @map("name_snapshot")
+  isPrimary     Boolean                  @default(false) @map("is_primary")
+  createdAt     DateTime                 @default(now()) @map("created_at")
+
+  event     Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  recipient EventRecipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, sourceType, sourceId])
+  @@index([recipientId])
+  @@index([eventId, sourceType])
+  @@map("event_recipient_sources")
+}
+
+model EventRecipientRole {
+  id                 String                        @id @default(uuid()) @db.Uuid
+  eventId            String                        @map("event_id") @db.Uuid
+  code               String
+  displayName        String                        @map("display_name")
+  kind               EventRecipientRoleKind
+  builtInKey         BuiltInEventRecipientRoleKey? @map("built_in_key")
+  sortOrder          Int                           @default(0) @map("sort_order")
+  isActive           Boolean                       @default(true) @map("is_active")
+  isArtifactEligible Boolean                       @default(true) @map("is_artifact_eligible")
+  sourceMapping      EventRecipientRoleSourceType? @map("source_mapping")
+  createdAt          DateTime                      @default(now()) @map("created_at")
+  updatedAt          DateTime                      @updatedAt @map("updated_at")
+
+  // === Локализация ===
+  // translations: { displayName?: { ru?, uz?, en? } }. Скаляр displayName выше —
+  // fallback для legacy data; built-in роли можно перевести через i18n keys
+  // (resolveLocalizedField на фронте).
+  translations Json @default("{}")
+
+  event                Event                          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  assignments          EventRecipientRoleAssignment[]
+  certificates         Certificate[]
+  certificateTemplates CertificateTemplate[]
+  badgeTemplates       BadgeTemplate[]
+
+  @@unique([eventId, code])
+  @@unique([eventId, builtInKey])
+  @@index([eventId, isActive])
+  @@index([eventId, isArtifactEligible])
+  @@map("event_recipient_roles")
+}
+
+model EventRecipientRoleAssignment {
+  id          String                             @id @default(uuid()) @db.Uuid
+  eventId     String                             @map("event_id") @db.Uuid
+  recipientId String                             @map("recipient_id") @db.Uuid
+  roleId      String                             @map("role_id") @db.Uuid
+  sourceType  EventRecipientRoleSourceType?      @map("source_type")
+  sourceId    String?                            @map("source_id") @db.Uuid
+  status      EventRecipientRoleAssignmentStatus @default(ACTIVE)
+  createdAt   DateTime                           @default(now()) @map("created_at")
+  updatedAt   DateTime                           @updatedAt @map("updated_at")
+
+  event     Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  recipient EventRecipient     @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  role      EventRecipientRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([recipientId, roleId])
+  @@index([eventId, roleId, status])
+  @@index([eventId, recipientId])
+  @@map("event_recipient_role_assignments")
+}
+
+// ==================== QUESTION ANSWER ====================
+
+model QuestionAnswer {
+  id             String   @id @default(uuid()) @db.Uuid
+  registrationId String   @map("registration_id") @db.Uuid
+  questionId     String   @map("question_id") @db.Uuid
+  answer         String   @db.Text
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  registration Registration         @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  question     RegistrationQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([registrationId, questionId])
+  @@map("question_answers")
+}
+
+// ==================== REGISTRATION FILE UPLOAD ====================
+
+// Файл, загруженный участником в ответ на вопрос типа FILE_UPLOAD.
+// Хранится в приватной директории (НЕ в публичном /uploads), отдаётся
+// только через авторизованный download-эндпоинт с проверкой tenant-доступа.
+model RegistrationFileUpload {
+  id             String                 @id @default(uuid()) @db.Uuid
+  eventId        String                 @map("event_id") @db.Uuid
+  questionId     String                 @map("question_id") @db.Uuid
+  // null до сабмита (файл загружен, но регистрация ещё не создана).
+  registrationId String?                @map("registration_id") @db.Uuid
+  // Снимок tenant-владельца события — денормализован для tenant-isolation.
+  organizationId String                 @map("organization_id") @db.Uuid
+  // Пользователь, загрузивший файл (для проверки владения PENDING-файлами).
+  uploadedById   String?                @map("uploaded_by_id") @db.Uuid
+  originalName   String                 @map("original_name")
+  // Относительный путь внутри приватного стораджа (не публичный URL).
+  storedPath     String                 @map("stored_path")
+  mimeType       String                 @map("mime_type")
+  size           Int
+  status         RegistrationFileStatus @default(PENDING)
+  createdAt      DateTime               @default(now()) @map("created_at")
+
+  event        Event                @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  question     RegistrationQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  registration Registration?        @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@index([questionId])
+  @@index([registrationId])
+  @@index([uploadedById])
+  // Tenant-isolation scans on the denormalized organization snapshot.
+  @@index([organizationId])
+  @@map("registration_file_uploads")
+}
+
+// ==================== ATTENDANCE ====================
+
+/**
+ * Промежуточный чекпоинт события: именованное окно времени, внутри которого
+ * участника отмечают ровно один раз («Регистрация», «Обед», «День 2 — вход»).
+ * Окна одного события не пересекаются (валидация в EventCheckpointsService),
+ * поэтому в любой момент активен максимум один чекпоинт. Окно полуоткрытое:
+ * [startsAt, endsAt) — соседние чекпоинты могут стыковаться встык.
+ */
+model EventCheckpoint {
+  id        String   @id @default(uuid()) @db.Uuid
+  eventId   String   @map("event_id") @db.Uuid
+  name      String
+  startsAt  DateTime @map("starts_at")
+  endsAt    DateTime @map("ends_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  event       Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  attendances Attendance[]
+
+  @@index([eventId, startsAt])
+  @@map("event_checkpoints")
+}
+
+/**
+ * Уникальность отметки задана двумя ЧАСТИЧНЫМИ индексами (Prisma их не умеет,
+ * см. migration 20260811120000_add_event_checkpoints):
+ * - (registration_id, check_in_date) WHERE checkpoint_id IS NULL  — старое
+ * правило «один check-in на UTC-день», когда активного чекпоинта нет;
+ * - (registration_id, checkpoint_id) WHERE checkpoint_id IS NOT NULL — один
+ * check-in на чекпоинт.
+ * Поэтому дедуп в сервисах — findFirst + перехват P2002, а не findUnique.
+ */
+model Attendance {
+  id             String   @id @default(uuid()) @db.Uuid
+  registrationId String   @map("registration_id") @db.Uuid
+  checkpointId   String?  @map("checkpoint_id") @db.Uuid
+  checkInAt      DateTime @map("check_in_at")
+  checkInDate    DateTime @map("check_in_date") @db.Date // Дата для группировки по дням
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  registration Registration     @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  checkpoint   EventCheckpoint? @relation(fields: [checkpointId], references: [id], onDelete: Cascade)
+
+  @@index([registrationId])
+  @@index([checkInDate])
+  @@index([checkpointId])
+  @@map("attendances")
+}
+
+// ==================== CERTIFICATE TEMPLATE ====================
+
+model CertificateTemplate {
+  id                String          @id @default(uuid()) @db.Uuid
+  eventId           String          @map("event_id") @db.Uuid
+  recipientRoleId   String?         @map("recipient_role_id") @db.Uuid
+  name              String
+  recipientRole     ParticipantRole @default(PARTICIPANT) @map("recipient_role")
+  sizePreset        String          @default("A4_LANDSCAPE") @map("size_preset")
+  widthPx           Int             @default(3508) @map("width_px")
+  heightPx          Int             @default(2480) @map("height_px")
+  templateUrl       String          @map("template_url")
+  thumbnailUrl      String?         @map("thumbnail_url")
+  namePosition      Json            @map("name_position") // { x, y } в %
+  nameFont          String?         @map("name_font")
+  nameFontSize      Int?            @map("name_font_size")
+  nameColor         String?         @map("name_color")
+  datePosition      Json?           @map("date_position") // { x, y }
+  eventNamePosition Json?           @map("event_name_position") // { x, y }
+  firstNamePosition Json?           @map("first_name_position") // { x, y, width?, height? }
+  lastNamePosition  Json?           @map("last_name_position")
+  qrPosition        Json?           @map("qr_position")
+  isDefault         Boolean         @default(false) @map("is_default")
+  isActive          Boolean         @default(true) @map("is_active")
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+
+  // Локализация name: { name: { ru?, uz?, en? } }
+  translations Json @default("{}")
+
+  event                   Event               @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  normalizedRecipientRole EventRecipientRole? @relation(fields: [recipientRoleId], references: [id], onDelete: SetNull)
+  certificates            Certificate[]
+
+  @@index([eventId])
+  @@index([eventId, recipientRole])
+  @@index([eventId, recipientRoleId])
+  @@index([recipientRoleId])
+  @@map("certificate_templates")
+}
+
+// ==================== CERTIFICATE ====================
+
+model Certificate {
+  id                    String                 @id @default(uuid()) @db.Uuid
+  eventId               String                 @map("event_id") @db.Uuid
+  registrationId        String?                @unique @map("registration_id") @db.Uuid
+  eventRecipientId      String?                @map("event_recipient_id") @db.Uuid
+  recipientRoleId       String?                @map("recipient_role_id") @db.Uuid
+  templateId            String?                @map("template_id") @db.Uuid
+  normalizedArtifactKey String?                @unique @map("normalized_artifact_key")
+  certificateUrl        String?                @map("certificate_url")
+  templateVersionHash   String?                @map("template_version_hash")
+  isCurrent             Boolean                @default(true) @map("is_current")
+  generationStatus      AssetGenerationStatus? @map("generation_status")
+  generationError       String?                @map("generation_error") @db.Text
+  generatedAt           DateTime?              @map("generated_at")
+  downloadCount         Int                    @default(0) @map("download_count")
+  recipientName         String?                @map("recipient_name")
+  recipientEmail        String?                @map("recipient_email")
+  eventName             String?                @map("event_name")
+  eventDate             DateTime?              @map("event_date") @db.Date
+  verificationCode      String?                @unique @map("verification_code")
+  createdAt             DateTime               @default(now()) @map("created_at")
+  updatedAt             DateTime               @updatedAt @map("updated_at")
+
+  event          Event                @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  registration   Registration?        @relation(fields: [registrationId], references: [id], onDelete: SetNull)
+  eventRecipient EventRecipient?      @relation(fields: [eventRecipientId], references: [id], onDelete: SetNull)
+  recipientRole  EventRecipientRole?  @relation(fields: [recipientRoleId], references: [id], onDelete: SetNull)
+  template       CertificateTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+
+  @@index([eventId])
+  @@index([templateId])
+  @@index([eventRecipientId])
+  @@index([recipientRoleId])
+  @@index([eventRecipientId, recipientRoleId, isCurrent])
+  @@index([generationStatus])
+  @@index([verificationCode])
+  @@map("certificates")
+}
+
+// ==================== BADGE TEMPLATE ====================
+
+model BadgeTemplate {
+  id                String          @id @default(uuid()) @db.Uuid
+  eventId           String          @map("event_id") @db.Uuid
+  recipientRoleId   String?         @map("recipient_role_id") @db.Uuid
+  name              String
+  recipientRole     ParticipantRole @default(PARTICIPANT) @map("recipient_role")
+  sizePreset        String          @default("BADGE_85X55") @map("size_preset")
+  widthPx           Int             @default(1004) @map("width_px")
+  heightPx          Int             @default(650) @map("height_px")
+  templateUrl       String          @map("template_url")
+  thumbnailUrl      String?         @map("thumbnail_url")
+  namePosition      Json?           @map("name_position")
+  nameFont          String?         @map("name_font")
+  nameFontSize      Int?            @map("name_font_size")
+  nameColor         String?         @map("name_color")
+  firstNamePosition Json?           @map("first_name_position")
+  lastNamePosition  Json?           @map("last_name_position")
+  rolePosition      Json?           @map("role_position")
+  eventNamePosition Json?           @map("event_name_position")
+  qrPosition        Json?           @map("qr_position")
+  // Тексты роли и названия события на бейдже. null = поведение по умолчанию:
+  // роль печатается по displayName роли, событие — по title, кегль/цвет фиксированные.
+  roleLabel         String?         @map("role_label")
+  roleFontSize      Int?            @map("role_font_size")
+  roleColor         String?         @map("role_color")
+  eventLabel        String?         @map("event_label")
+  eventFontSize     Int?            @map("event_font_size")
+  eventColor        String?         @map("event_color")
+  isDefault         Boolean         @default(false) @map("is_default")
+  isActive          Boolean         @default(true) @map("is_active")
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+
+  // Локализация name: { name: { ru?, uz?, en? } }
+  translations Json @default("{}")
+
+  event                   Event               @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  normalizedRecipientRole EventRecipientRole? @relation(fields: [recipientRoleId], references: [id], onDelete: SetNull)
+
+  @@index([eventId])
+  @@index([eventId, recipientRole])
+  @@index([eventId, recipientRoleId])
+  @@index([recipientRoleId])
+  @@map("badge_templates")
+}
+
+model TicketArtifact {
+  id               String                 @id @default(uuid()) @db.Uuid
+  registrationId   String                 @map("registration_id") @db.Uuid
+  design           TicketArtifactDesign
+  ticketUrl        String?                @map("ticket_url")
+  generationStatus AssetGenerationStatus? @map("generation_status")
+  generationError  String?                @map("generation_error") @db.Text
+  generatedAt      DateTime?              @map("generated_at")
+  createdAt        DateTime               @default(now()) @map("created_at")
+  updatedAt        DateTime               @updatedAt @map("updated_at")
+
+  registration Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+
+  @@unique([registrationId, design])
+  @@index([generationStatus])
+  @@map("ticket_artifacts")
+}
+
+// ==================== USER CERTIFICATE (Сертификаты профиля пользователя) ====================
+
+model UserCertificate {
+  id     String @id @default(uuid()) @db.Uuid
+  userId String @map("user_id") @db.Uuid
+
+  // Основная информация
+  title       String // Название сертификата
+  provider    String // Провайдер/академия (EVENTFLOW ACADEMY, CX COLLECTIVE и т.д.)
+  description String? @db.Text // Описание программы
+
+  // Данные сертификата
+  issueDate      DateTime  @map("issue_date") @db.Date // Дата выдачи
+  expiryDate     DateTime? @map("expiry_date") @db.Date // Дата истечения (опционально)
+  trainingHours  Int       @default(0) @map("training_hours") // Часов обучения
+  credentialId   String?   @map("credential_id") // Уникальный идентификатор (EVT-PRO-4829)
+  credentialUrl  String?   @map("credential_url") // Ссылка для проверки
+  certificateUrl String?   @map("certificate_url") // Ссылка на PDF файл
+
+  // Навыки/теги
+  skills String[] // Массив навыков (QR & RFID, Service Design и т.д.)
+
+  // Статус и отображение
+  isVerified Boolean @default(false) @map("is_verified") // Верифицирован ли
+  color      String? // Цвет карточки (HEX, например #F59E0B)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isVerified])
+  @@map("user_certificates")
+}
+
+// ==================== EVENT COMMENT (Комментарии к мероприятию) ====================
+
+model EventComment {
+  id                   String  @id @default(uuid()) @db.Uuid
+  eventId              String  @map("event_id") @db.Uuid
+  // Один из двух всегда задан — обычный пользователь ИЛИ организация-автор события.
+  // Поддерживается на уровне приложения; для миграции существующих комментариев
+  // userId остаётся nullable (но в новых записях один из двух обязателен).
+  userId               String? @map("user_id") @db.Uuid
+  authorOrganizationId String? @map("author_organization_id") @db.Uuid
+  parentId             String? @map("parent_id") @db.Uuid // Для ответов на комментарии
+
+  content String @db.Text
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  event              Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user               User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  authorOrganization Organization?      @relation("OrganizationEventComments", fields: [authorOrganizationId], references: [id], onDelete: Cascade)
+  parent             EventComment?      @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies            EventComment[]     @relation("CommentReplies")
+  likes              EventCommentLike[]
+
+  @@index([eventId])
+  @@index([userId])
+  @@index([authorOrganizationId])
+  @@index([parentId])
+  @@index([createdAt])
+  @@map("event_comments")
+}
+
+// ==================== EVENT COMMENT LIKE (Лайки/дизлайки комментариев) ====================
+
+model EventCommentLike {
+  commentId String  @map("comment_id") @db.Uuid
+  userId    String  @map("user_id") @db.Uuid
+  isLike    Boolean @map("is_like") // true = лайк, false = дизлайк
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  comment EventComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([commentId, userId])
+  @@index([commentId])
+  @@index([userId])
+  @@map("event_comment_likes")
+}
+
+// ==================== SAVED EVENT (Сохранённые мероприятия пользователя) ====================
+
+model SavedEvent {
+  id      String @id @default(uuid()) @db.Uuid
+  userId  String @map("user_id") @db.Uuid
+  eventId String @map("event_id") @db.Uuid
+
+  savedAt DateTime @default(now()) @map("saved_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId]) // Нельзя сохранить одно мероприятие дважды
+  @@index([userId])
+  @@index([eventId])
+  @@index([savedAt])
+  @@map("saved_events")
+}
+
+// ==================== EVENT TAG (Теги мероприятий) ====================
+
+model EventTag {
+  id             String      @id @default(uuid()) @db.Uuid
+  name           String
+  slug           String
+  category       TagCategory @default(CUSTOM)
+  isSystem       Boolean     @default(false) @map("is_system")
+  organizationId String?     @map("organization_id") @db.Uuid
+  createdAt      DateTime    @default(now()) @map("created_at")
+
+  organization Organization?           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  events       EventTagAssignment[]
+  blogPosts    BlogPostTagAssignment[]
+
+  @@unique([organizationId, slug])
+  @@index([isSystem])
+  @@index([organizationId])
+  @@index([category])
+  @@map("event_tags")
+}
+
+// ==================== EVENT TAG ASSIGNMENT (Связь мероприятие-теги) ====================
+
+model EventTagAssignment {
+  eventId String @map("event_id") @db.Uuid
+  tagId   String @map("tag_id") @db.Uuid
+
+  event Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  tag   EventTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([eventId, tagId])
+  @@index([eventId])
+  @@index([tagId])
+  @@map("event_tag_assignments")
+}
+
+// ==================== SAVED ARTICLE (Избранные статьи пользователя) ====================
+
+model SavedArticle {
+  id     String @id @default(uuid()) @db.Uuid
+  userId String @map("user_id") @db.Uuid
+
+  // Данные статьи (сохраняются при добавлении в избранное)
+  articleUrl String  @map("article_url") // Ссылка на оригинальную статью
+  title      String // Заголовок статьи
+  excerpt    String? @db.Text // Краткое описание
+  coverImage String? @map("cover_image") // Изображение обложки
+  category   String? // Категория (TIPS-GUIDES, EVENT-MARKETING, NEWS-TRENDS)
+
+  // Метаданные статьи
+  publishedAt DateTime? @map("published_at") // Дата публикации статьи
+  readingTime Int?      @map("reading_time") // Время чтения в минутах
+  authorName  String?   @map("author_name") // Автор статьи
+
+  savedAt DateTime @default(now()) @map("saved_at") // Когда сохранена
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, articleUrl]) // Нельзя сохранить одну статью дважды
+  @@index([userId])
+  @@index([savedAt])
+  @@map("saved_articles")
+}
+
+// ==================== USER FOLLOWING (Подписки пользователей на организаторов) ====================
+
+model UserFollowing {
+  id             String   @id @default(uuid()) @db.Uuid
+  userId         String   @map("user_id") @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+  @@index([userId])
+  @@index([organizationId])
+  @@map("user_followings")
+}
+
+// ==================== CONTACT REQUEST (Заявки на связь с организатором) ====================
+
+model ContactRequest {
+  id                      String               @id @default(uuid()) @db.Uuid
+  userId                  String?              @map("user_id") @db.Uuid
+  organizationId          String               @map("organization_id") @db.Uuid
+  requesterOrganizationId String?              @map("requester_organization_id") @db.Uuid
+  rentalPlaceId           String?              @map("rental_place_id") @db.Uuid
+  type                    ContactRequestType   @default(GENERAL)
+  rentalType              RentalType?          @map("rental_type")
+  phone                   String
+  message                 String?              @db.Text
+  status                  ContactRequestStatus @default(NEW)
+  createdAt               DateTime             @default(now()) @map("created_at")
+  updatedAt               DateTime             @updatedAt @map("updated_at")
+
+  user                  User?         @relation("UserContactRequests", fields: [userId], references: [id], onDelete: SetNull)
+  organization          Organization  @relation("OrganizationContactRequests", fields: [organizationId], references: [id], onDelete: Cascade)
+  requesterOrganization Organization? @relation("RequesterOrganizationContactRequests", fields: [requesterOrganizationId], references: [id], onDelete: SetNull)
+  rentalPlace           RentalPlace?  @relation(fields: [rentalPlaceId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([organizationId])
+  @@index([status])
+  @@index([type])
+  @@index([requesterOrganizationId])
+  @@index([rentalPlaceId])
+  @@map("contact_requests")
+}
+
+// ==================== BOARD (Доска задач) ====================
+
+model Board {
+  id              String   @id @default(uuid()) @db.Uuid
+  organizationId  String   @map("organization_id") @db.Uuid
+  eventId         String?  @map("event_id") @db.Uuid
+  name            String
+  description     String?  @db.Text
+  coverImage      String?  @map("cover_image")
+  backgroundColor String?  @map("background_color")
+  settings        Json?    @default("{}") // Кастомизация: тема, цвета карточек и т.д.
+  isFavorite      Boolean  @default(false) @map("is_favorite")
+  isArchived      Boolean  @default(false) @map("is_archived")
+  createdById     String?  @map("created_by_id") @db.Uuid // Nullable для создания организацией
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  organization Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  event        Event?              @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  createdBy    OrganizationMember? @relation("BoardCreator", fields: [createdById], references: [id])
+  columns      BoardColumn[]
+  tasks        BoardTask[]
+  tags         BoardTag[]
+  members      BoardMember[]
+
+  @@index([organizationId])
+  @@index([eventId])
+  @@index([isArchived])
+  @@map("boards")
+}
+
+// ==================== BOARD COLUMN (Колонка доски) ====================
+
+model BoardColumn {
+  id        String   @id @default(uuid()) @db.Uuid
+  boardId   String   @map("board_id") @db.Uuid
+  name      String
+  color     String? // HEX цвет колонки
+  position  Int      @default(0)
+  wipLimit  Int?     @map("wip_limit") // Work In Progress лимит
+  isDefault Boolean  @default(false) @map("is_default") // Колонка "Готово"
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  board Board       @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  tasks BoardTask[]
+
+  @@index([boardId])
+  @@map("board_columns")
+}
+
+// ==================== BOARD TASK (Задача) ====================
+
+model BoardTask {
+  id             String       @id @default(uuid()) @db.Uuid
+  boardId        String       @map("board_id") @db.Uuid
+  columnId       String       @map("column_id") @db.Uuid
+  title          String
+  description    String?      @db.Text
+  type           TaskType     @default(TASK)
+  priority       TaskPriority @default(MEDIUM)
+  position       Int          @default(0)
+  dueDate        DateTime?    @map("due_date")
+  startDate      DateTime?    @map("start_date")
+  estimatedHours Decimal?     @map("estimated_hours") @db.Decimal(6, 2)
+  loggedHours    Decimal?     @default(0) @map("logged_hours") @db.Decimal(6, 2)
+  coverImage     String?      @map("cover_image")
+  coverColor     String?      @map("cover_color")
+  isCompleted    Boolean      @default(false) @map("is_completed")
+  completedAt    DateTime?    @map("completed_at")
+  createdById    String?      @map("created_by_id") @db.Uuid // Nullable для организации
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  board       Board                 @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  column      BoardColumn           @relation(fields: [columnId], references: [id], onDelete: Cascade)
+  assignees   BoardTaskAssignee[]
+  tags        BoardTaskTag[]
+  comments    BoardTaskComment[]
+  attachments BoardTaskAttachment[]
+  checklists  BoardTaskChecklist[]
+  activities  BoardTaskActivity[]
+
+  @@index([boardId])
+  @@index([columnId])
+  @@index([isCompleted])
+  @@index([dueDate])
+  @@map("board_tasks")
+}
+
+// ==================== BOARD TAG (Тег доски) ====================
+
+model BoardTag {
+  id        String   @id @default(uuid()) @db.Uuid
+  boardId   String   @map("board_id") @db.Uuid
+  name      String
+  color     String // HEX цвет тега
+  createdAt DateTime @default(now()) @map("created_at")
+
+  board Board          @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  tasks BoardTaskTag[]
+
+  @@unique([boardId, name])
+  @@index([boardId])
+  @@map("board_tags")
+}
+
+// ==================== BOARD TASK TAG (Связь задача-тег) ====================
+
+model BoardTaskTag {
+  taskId String @map("task_id") @db.Uuid
+  tagId  String @map("tag_id") @db.Uuid
+
+  task BoardTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  tag  BoardTag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, tagId])
+  @@map("board_task_tags")
+}
+
+// ==================== BOARD TASK ASSIGNEE (Исполнители задачи) ====================
+
+model BoardTaskAssignee {
+  taskId       String   @map("task_id") @db.Uuid
+  memberId     String   @map("member_id") @db.Uuid
+  assignedAt   DateTime @default(now()) @map("assigned_at")
+  assignedById String?  @map("assigned_by_id") @db.Uuid // Nullable для организации
+
+  task       BoardTask           @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  member     OrganizationMember  @relation("TaskAssignee", fields: [memberId], references: [id], onDelete: Cascade)
+  assignedBy OrganizationMember? @relation("TaskAssignedBy", fields: [assignedById], references: [id])
+
+  @@id([taskId, memberId])
+  @@map("board_task_assignees")
+}
+
+// ==================== BOARD TASK COMMENT (Комментарий к задаче) ====================
+
+model BoardTaskComment {
+  id        String   @id @default(uuid()) @db.Uuid
+  taskId    String   @map("task_id") @db.Uuid
+  memberId  String?  @map("member_id") @db.Uuid // Nullable для организации
+  content   String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  task   BoardTask           @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  member OrganizationMember? @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@map("board_task_comments")
+}
+
+// ==================== BOARD TASK ATTACHMENT (Вложение к задаче) ====================
+
+model BoardTaskAttachment {
+  id           String   @id @default(uuid()) @db.Uuid
+  taskId       String   @map("task_id") @db.Uuid
+  fileName     String   @map("file_name")
+  fileUrl      String   @map("file_url")
+  fileSize     Int      @map("file_size") // Размер в байтах
+  mimeType     String   @map("mime_type")
+  uploadedById String?  @map("uploaded_by_id") @db.Uuid // Nullable для организации
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  task       BoardTask           @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  uploadedBy OrganizationMember? @relation(fields: [uploadedById], references: [id])
+
+  @@index([taskId])
+  @@map("board_task_attachments")
+}
+
+// ==================== BOARD TASK CHECKLIST (Чеклист задачи) ====================
+
+model BoardTaskChecklist {
+  id        String   @id @default(uuid()) @db.Uuid
+  taskId    String   @map("task_id") @db.Uuid
+  title     String
+  position  Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  task  BoardTask            @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  items BoardChecklistItem[]
+
+  @@index([taskId])
+  @@map("board_task_checklists")
+}
+
+// ==================== BOARD CHECKLIST ITEM (Пункт чеклиста) ====================
+
+model BoardChecklistItem {
+  id            String    @id @default(uuid()) @db.Uuid
+  checklistId   String    @map("checklist_id") @db.Uuid
+  title         String
+  isCompleted   Boolean   @default(false) @map("is_completed")
+  position      Int       @default(0)
+  completedAt   DateTime? @map("completed_at")
+  completedById String?   @map("completed_by_id") @db.Uuid
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  checklist   BoardTaskChecklist  @relation(fields: [checklistId], references: [id], onDelete: Cascade)
+  completedBy OrganizationMember? @relation(fields: [completedById], references: [id])
+
+  @@index([checklistId])
+  @@map("board_checklist_items")
+}
+
+// ==================== BOARD TASK ACTIVITY (История изменений задачи) ====================
+
+model BoardTaskActivity {
+  id        String       @id @default(uuid()) @db.Uuid
+  taskId    String       @map("task_id") @db.Uuid
+  memberId  String?      @map("member_id") @db.Uuid // Nullable для организации
+  type      ActivityType
+  details   Json? // Детали изменения: { field: "title", oldValue: "...", newValue: "..." }
+  createdAt DateTime     @default(now()) @map("created_at")
+
+  task   BoardTask           @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  member OrganizationMember? @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@index([createdAt])
+  @@map("board_task_activities")
+}
+
+// ==================== BOARD MEMBER (Участник доски) ====================
+
+model BoardMember {
+  boardId   String    @map("board_id") @db.Uuid
+  memberId  String    @map("member_id") @db.Uuid
+  role      BoardRole @default(MEMBER)
+  addedAt   DateTime  @default(now()) @map("added_at")
+  addedById String?   @map("added_by_id") @db.Uuid // Nullable для организации
+
+  board   Board               @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  member  OrganizationMember  @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  addedBy OrganizationMember? @relation("BoardMemberAddedBy", fields: [addedById], references: [id])
+
+  @@id([boardId, memberId])
+  @@map("board_members")
+}
+
+// ==================== EMAIL VERIFICATION CODE ====================
+
+model EmailVerificationCode {
+  id        String               @id @default(uuid()) @db.Uuid
+  code      String // 6-значный код
+  email     String // Email получателя
+  type      VerificationCodeType // EMAIL_VERIFICATION, PASSWORD_RESET, EMAIL_CHANGE
+  actorType UserType             @map("actor_type") // USER, ORGANIZATION, MEMBER
+  actorId   String?              @map("actor_id") @db.Uuid // ID actor (nullable для разных типов)
+
+  // Для смены email
+  newEmail String? // Новый email (для type = EMAIL_CHANGE)
+
+  // Статусы
+  isUsed    Boolean   @default(false) @map("is_used")
+  usedAt    DateTime? @map("used_at")
+  expiresAt DateTime  @map("expires_at") // Истекает через 5 минут
+  attempts  Int       @default(0) // Количество попыток проверки
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([email, type, isUsed])
+  @@index([code, expiresAt])
+  @@index([actorId])
+  @@map("email_verification_codes")
+}
+
+// ==================== BLOG POST (Статья блога) ====================
+
+model BlogPost {
+  id                  String         @id @default(uuid()) @db.Uuid
+  organizationId      String         @map("organization_id") @db.Uuid
+  // Optional byline author — points to an OrganizationMember (org staff,
+  // not a platform-wide User account). When set, the public site emits
+  // `BlogPosting.author = Person` (name/avatar/bio from the member) for
+  // E-E-A-T. When null, falls back to `author = Organization`. SetNull on
+  // delete so removing a member doesn't take down their published posts.
+  authorId            String?        @map("author_id") @db.Uuid
+  title               String
+  slug                String         @unique
+  content             Json // BlockNote document
+  shortDescription    String?        @map("short_description") @db.VarChar(500)
+  translations        Json           @default("{}")
+  translationMeta     Json           @default("{}") @map("translation_meta")
+  richTranslations    Json           @default("{}") @map("rich_translations")
+  richTranslationMeta Json           @default("{}") @map("rich_translation_meta")
+  coverImage          String?        @map("cover_image")
+  categoryId          String?        @map("category_id") @db.Uuid
+  status              BlogPostStatus @default(DRAFT)
+  commentsEnabled     Boolean        @default(true) @map("comments_enabled")
+  readingTime         Int            @default(0) @map("reading_time") // минуты
+
+  // Модерация
+  rejectionMessage String?   @map("rejection_message") @db.Text
+  reviewedAt       DateTime? @map("reviewed_at")
+  publishedAt      DateTime? @map("published_at")
+
+  // Счётчики (денормализация для производительности)
+  likesCount    Int @default(0) @map("likes_count")
+  commentsCount Int @default(0) @map("comments_count")
+  viewsCount    Int @default(0) @map("views_count")
+
+  // Удаление супер-админом (soft delete)
+  deletedAt             DateTime? @map("deleted_at")
+  deletedBySuperAdminId String?   @map("deleted_by_super_admin_id") @db.Uuid
+  deletionReason        String?   @map("deletion_reason") @db.Text
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  organization        Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  category            BlogCategory?           @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  author              OrganizationMember?     @relation("BlogPostAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  deletedBySuperAdmin SuperAdmin?             @relation(fields: [deletedBySuperAdminId], references: [id], onDelete: SetNull)
+  tags                BlogPostTagAssignment[]
+  comments            BlogPostComment[]
+  likes               BlogPostLike[]
+  savedBy             SavedBlogPost[]
+
+  @@index([organizationId])
+  @@index([authorId])
+  @@index([status])
+  @@index([publishedAt])
+  @@index([slug])
+  @@index([categoryId])
+  @@map("blog_posts")
+}
+
+// ==================== BLOG CATEGORY (Категории блога) ====================
+
+model BlogCategory {
+  id              String  @id @default(uuid()) @db.Uuid
+  name            String  @unique
+  slug            String  @unique
+  description     String? @db.Text
+  translations    Json    @default("{}")
+  translationMeta Json    @default("{}") @map("translation_meta")
+  sortOrder       Int     @default(0) @map("sort_order")
+  isActive        Boolean @default(true) @map("is_active")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  posts BlogPost[]
+
+  @@index([isActive, sortOrder])
+  @@map("blog_categories")
+}
+
+// ==================== BLOG POST LIKE (Лайки статей) ====================
+
+model BlogPostLike {
+  postId    String   @map("post_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+
+  post BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([postId, userId])
+  @@index([postId])
+  @@index([userId])
+  @@map("blog_post_likes")
+}
+
+// ==================== BLOG POST COMMENT (Комментарии к статье) ====================
+
+model BlogPostComment {
+  id       String  @id @default(uuid()) @db.Uuid
+  postId   String  @map("post_id") @db.Uuid
+  userId   String  @map("user_id") @db.Uuid
+  parentId String? @map("parent_id") @db.Uuid
+  content  String  @db.Text
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  post    BlogPost              @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user    User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent  BlogPostComment?      @relation("BlogCommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies BlogPostComment[]     @relation("BlogCommentReplies")
+  likes   BlogPostCommentLike[]
+
+  @@index([postId])
+  @@index([userId])
+  @@index([parentId])
+  @@index([createdAt])
+  @@map("blog_post_comments")
+}
+
+// ==================== BLOG POST COMMENT LIKE (Лайки/дизлайки комментариев) ====================
+
+model BlogPostCommentLike {
+  commentId String  @map("comment_id") @db.Uuid
+  userId    String  @map("user_id") @db.Uuid
+  isLike    Boolean @map("is_like") // true = лайк, false = дизлайк
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  comment BlogPostComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([commentId, userId])
+  @@index([commentId])
+  @@index([userId])
+  @@map("blog_post_comment_likes")
+}
+
+// ==================== SAVED BLOG POST (Сохранённые статьи блога) ====================
+
+model SavedBlogPost {
+  id      String   @id @default(uuid()) @db.Uuid
+  userId  String   @map("user_id") @db.Uuid
+  postId  String   @map("post_id") @db.Uuid
+  savedAt DateTime @default(now()) @map("saved_at")
+
+  user User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@index([userId])
+  @@index([postId])
+  @@index([savedAt])
+  @@map("saved_blog_posts")
+}
+
+// ==================== BLOG POST TAG ASSIGNMENT (Связь статья-теги) ====================
+
+model BlogPostTagAssignment {
+  postId String @map("post_id") @db.Uuid
+  tagId  String @map("tag_id") @db.Uuid
+
+  post BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag  EventTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+  @@index([postId])
+  @@index([tagId])
+  @@map("blog_post_tag_assignments")
+}
+
+// ==================== EVENT CATEGORY (Категории событий) ====================
+
+model EventCategory {
+  id              String  @id @default(uuid()) @db.Uuid
+  name            String  @unique
+  slug            String  @unique
+  icon            String? // Название иконки (например: "book", "users", "mic")
+  description     String? @db.Text
+  translations    Json    @default("{}")
+  translationMeta Json    @default("{}") @map("translation_meta")
+  sortOrder       Int     @default(0) @map("sort_order")
+  isActive        Boolean @default(true) @map("is_active")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  events Event[] @relation("EventCategories")
+
+  @@index([isActive, sortOrder])
+  @@map("event_categories")
+}
+
+// ==================== EVENT COLLECTION (Подборки событий) ====================
+
+model EventCollection {
+  id              String  @id @default(uuid()) @db.Uuid
+  title           String
+  slug            String  @unique
+  coverImage      String? @map("cover_image") // URL изображения обложки
+  gradientStart   String? @map("gradient_start") // Цвет начала градиента (HEX)
+  gradientEnd     String? @map("gradient_end") // Цвет конца градиента (HEX)
+  description     String? @db.Text
+  translations    Json    @default("{}")
+  translationMeta Json    @default("{}") @map("translation_meta")
+  sortOrder       Int     @default(0) @map("sort_order")
+  isActive        Boolean @default(true) @map("is_active")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  events EventCollectionItem[]
+
+  @@index([isActive, sortOrder])
+  @@map("event_collections")
+}
+
+// ==================== EVENT COLLECTION ITEM (Связь подборка-событие) ====================
+
+model EventCollectionItem {
+  collectionId String   @map("collection_id") @db.Uuid
+  eventId      String   @map("event_id") @db.Uuid
+  sortOrder    Int      @default(0) @map("sort_order")
+  addedAt      DateTime @default(now()) @map("added_at")
+
+  collection EventCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  event      Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@id([collectionId, eventId])
+  @@index([collectionId])
+  @@index([eventId])
+  @@map("event_collection_items")
+}
+
+// ==================== EMAIL UNSUBSCRIBE (Отписки от email-уведомлений) ====================
+
+model EmailUnsubscribe {
+  id             String   @id @default(uuid()) @db.Uuid
+  email          String
+  userId         String?  @map("user_id") @db.Uuid
+  category       String
+  unsubscribedAt DateTime @default(now()) @map("unsubscribed_at")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@unique([email, category])
+  @@index([email])
+  @@map("email_unsubscribes")
+}
+
+// ==================== ADMIN AUDIT LOG ====================
+
+/// Неизменяемый журнал опасных действий супер-админа (например, hard delete).
+/// Намеренно НЕ имеет внешних ключей на удаляемые сущности, чтобы запись
+/// переживала удаление и не каскадировалась вместе с ним.
+model AdminAuditLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  action      String // 'USER_HARD_DELETE' | 'ORGANIZATION_HARD_DELETE'
+  actorId     String   @map("actor_id") @db.Uuid // SuperAdmin.id
+  actorEmail  String?  @map("actor_email")
+  targetType  String   @map("target_type") // 'USER' | 'ORGANIZATION'
+  targetId    String   @map("target_id") @db.Uuid
+  targetLabel String?  @map("target_label") // email пользователя или название организации
+  metadata    Json     @default("{}") // снимок зависимостей и прочий контекст
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([targetType, targetId])
+  @@index([actorId])
+  @@index([createdAt])
+  @@map("admin_audit_logs")
+}
+
+// ============================================================================
+// МОНЕТИЗАЦИЯ (Stage 2). Все модели/энумы ниже — аддитивные.
+// Дизайн: docs/monetization/09-critic-report.md (CR-1, CR-2) + 10-decisions.md.
+// Деньги: BigInt минорные единицы (тийины/центы), string-on-wire (D-3).
+// Каталог НЕ хранит отображаемые строки — i18n по ключу (CR-19).
+// ============================================================================
+
+/// Ключ тарифа (§1 бизнес-модели). Расширение — additive ALTER TYPE.
+enum PlanKey {
+  START
+  PRO
+  EXCLUSIVE
+}
+
+/// Окно квоты генераций: календарный месяц (START) или период пакета (платные) — решение A-5.
+enum GenerationWindow {
+  CALENDAR_MONTH
+  PACK_PERIOD
+}
+
+/// Тир статистики. На запуске у всех BASIC (B-4: прогнозирование не продаётся, пока не построено).
+enum StatsTier {
+  BASIC
+  FORECASTING
+  FORECASTING_SLA
+}
+
+/// Режим QR check-in по тарифу (OQ-4/E-9: расширенные режимы зарезервированы).
+enum QrCheckInMode {
+  ARRIVAL_ONLY
+  EXTENDED
+}
+
+/// Вид add-on SKU: пакет монет или рекламный продукт (CR-2 — единый каталог).
+enum AddonSkuKind {
+  COIN_PACK
+  AD_PRODUCT
+}
+
+/// Метрика монет/потребления (CR-26: AI хранится в секундах).
+enum CoinMetric {
+  AI_SECONDS
+  GENERATION_UNITS
+}
+
+/// Единица тарификации рекламного SKU (решение D-2 группы D).
+enum AdBillingUnit {
+  PER_WEEK
+  PER_CAMPAIGN
+  PER_MESSAGE
+}
+
+/// Глобальный каталог тарифов (D-4). Изменяемые строки + снапшоты на покупках
+/// (CR-1: без PlanVersion; история правок — AdminAuditLog PRICE_SET).
+/// Цены NULL и isPurchasable=false до установки владельцем (D-15).
+model Plan {
+  id  String  @id @default(uuid()) @db.Uuid
+  key PlanKey @unique
+
+  /// Цена пакета в тийинах UZS; NULL = не установлена (продажа невозможна).
+  priceAmountMinor BigInt? @map("price_amount_minor")
+  /// USD-якорь в центах: до Stripe — только отображение; после M-18 — реально списываемая цена.
+  usdAnchorCents   Int?    @map("usd_anchor_cents")
+  /// Продаваемость (START — дефолтный бесплатный тариф, не продаётся).
+  isPurchasable    Boolean @default(false) @map("is_purchasable")
+  /// Виден ли в каталоге (public/cabinet). START виден, но не покупается.
+  isActive         Boolean @default(false) @map("is_active")
+
+  /// Кредиты на события в пакете (0/5/10) и срок пакета в днях (§2.1: 90; NULL у START).
+  eventCredits Int  @default(0) @map("event_credits")
+  validityDays Int? @map("validity_days")
+
+  /// Комиссия платформы в базисных пунктах (1200/800/600).
+  commissionBps Int @map("commission_bps")
+
+  /// Квоты (снапшотятся на PlanPurchase при покупке).
+  aiMinutesMonthly        Int              @default(0) @map("ai_minutes_monthly")
+  generationCredits       Int              @default(0) @map("generation_credits")
+  generationWindow        GenerationWindow @default(CALENDAR_MONTH) @map("generation_window")
+  staffSeats              Int              @default(1) @map("staff_seats")
+  maxParticipantsPerEvent Int?             @map("max_participants_per_event")
+  taskBoardEnabled        Boolean          @default(false) @map("task_board_enabled")
+  statsTier               StatsTier        @default(BASIC) @map("stats_tier")
+  qrMode                  QrCheckInMode    @default(ARRIVAL_ONLY) @map("qr_mode")
+
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  orders    Order[]
+  purchases PlanPurchase[]
+
+  @@map("plans")
+}
+
+/// Каталог add-on SKU: пакеты монет + рекламные продукты (CR-2, OQ-A4-4 — один каталог).
+model AddonSku {
+  id   String       @id @default(uuid()) @db.Uuid
+  /// Стабильный код для i18n и кода: COIN_AI_100MIN, COIN_GEN_100, AD_FEATURED_WEEK, ...
+  code String       @unique
+  kind AddonSkuKind
+
+  /// Для AD_PRODUCT это базовая/floor-цена; конкретный заказ носит свою цену (AdOrder, D-10).
+  priceAmountMinor BigInt? @map("price_amount_minor")
+  usdAnchorCents   Int?    @map("usd_anchor_cents")
+  isActive         Boolean @default(false) @map("is_active")
+
+  /// COIN_PACK: метрика и количество (AI: 6000 секунд = 100 минут; GEN: 100 единиц).
+  coinMetric   CoinMetric? @map("coin_metric")
+  coinQuantity Int?        @map("coin_quantity")
+
+  /// AD_PRODUCT: единица тарификации.
+  adBillingUnit AdBillingUnit? @map("ad_billing_unit")
+
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  orders Order[]
+
+  @@map("addon_skus")
+}
+
+/// Вид заказа (CR-15: одна таблица Order для всех видов продаж).
+enum OrderKind {
+  PLAN
+  COIN_PACK
+  ADVERTISING
+  TICKET_SALE
+}
+
+/// Статус заказа. REQUESTED — заявка managed-фазы (M-13-ext, CR-23):
+/// организация просит, оператор фулфиллит; c появлением чекаута заказ
+/// стартует с PENDING_PAYMENT.
+enum OrderStatus {
+  REQUESTED
+  PENDING_PAYMENT
+  PAID
+  CANCELLED
+  EXPIRED
+  REFUNDED
+}
+
+/// Платёжный провайдер. MANUAL — офлайн-оплата, записанная оператором (S-4).
+/// STRIPE зарезервирован (M-18, внешний гейт — зарубежное юрлицо).
+/// VIA — hosted-invoice чекаут (UZCARD/HUMO); подтверждение оплаты ТОЛЬКО
+/// серверным опросом статуса инвойса (у VIA нет подписанных вебхуков).
+enum PaymentProvider {
+  MANUAL
+  PAYME
+  CLICK
+  STRIPE
+  VIA
+}
+
+enum PaymentTxStatus {
+  CREATED
+  CONFIRMED
+  FAILED
+  REVERSED
+}
+
+/// Заказ (D-9) — tenant-scoped. Деньги в тийинах (BigInt, D-3).
+/// Для TICKET_SALE: registrationId уникален (partial-unique — NULL не
+/// конфликтуют), holdExpiresAt — TTL брони места (M-4), commission*-поля —
+/// снапшот комиссии на момент создания (M-6, неизменяемая история).
+model Order {
+  id             String      @id @default(uuid()) @db.Uuid
+  organizationId String      @map("organization_id") @db.Uuid
+  kind           OrderKind
+  status         OrderStatus @default(REQUESTED)
+
+  planId     String? @map("plan_id") @db.Uuid
+  addonSkuId String? @map("addon_sku_id") @db.Uuid
+  quantity   Int     @default(1)
+
+  eventId        String? @map("event_id") @db.Uuid
+  registrationId String? @unique @map("registration_id") @db.Uuid
+
+  amountMinor           BigInt   @map("amount_minor")
+  currency              Currency @default(UZS)
+  commissionBpsSnapshot Int?     @map("commission_bps_snapshot")
+  commissionAmountMinor BigInt?  @map("commission_amount_minor")
+
+  holdExpiresAt DateTime? @map("hold_expires_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  organization Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan         Plan?                @relation(fields: [planId], references: [id], onDelete: Restrict)
+  addonSku     AddonSku?            @relation(fields: [addonSkuId], references: [id], onDelete: Restrict)
+  event        Event?               @relation("EventTicketOrders", fields: [eventId], references: [id], onDelete: SetNull)
+  registration Registration?        @relation("RegistrationTicketOrder", fields: [registrationId], references: [id], onDelete: SetNull)
+  transactions PaymentTransaction[]
+  planPurchase PlanPurchase?
+  adOrder      AdOrder?
+
+  @@index([organizationId])
+  @@index([kind, status])
+  @@index([holdExpiresAt])
+  @@map("orders")
+}
+
+/// Платёжная транзакция провайдера (D-9). Идемпотентность вебхуков:
+/// @@unique([provider, providerTxnId]). payloadScrubbed — ТОЛЬКО вайтлист
+/// полей провайдера, без PII/карточных данных (CR-16, инвариант №7).
+model PaymentTransaction {
+  id            String          @id @default(uuid()) @db.Uuid
+  orderId       String          @map("order_id") @db.Uuid
+  provider      PaymentProvider
+  /// Id транзакции у провайдера; для MANUAL — внешний референс, введённый оператором (S-4, обязателен).
+  providerTxnId String          @map("provider_txn_id")
+  status        PaymentTxStatus @default(CREATED)
+  amountMinor   BigInt          @map("amount_minor")
+  currency      Currency        @default(UZS)
+
+  payloadScrubbed Json      @default("{}") @map("payload_scrubbed")
+  confirmedAt     DateTime? @map("confirmed_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerTxnId])
+  @@index([orderId])
+  @@map("payment_transactions")
+}
+
+/// Статус пакета тарифа (M-2 + §2.4: SUPERSEDED при смене тарифа).
+enum PlanPurchaseStatus {
+  PENDING_PAYMENT
+  ACTIVE
+  EXHAUSTED
+  EXPIRED
+  SUPERSEDED
+}
+
+/// Вид корректировки кредитов (append-only; S-3 + §2.4 carry-over + B-1 refund).
+enum PlanCreditAdjustmentKind {
+  ADMIN_ADJUST
+  CARRY_OVER
+  REFUND
+}
+
+/// Экземпляр купленного (или выданного оператором) пакета тарифа (D-5).
+/// Все *Snapshot-поля фиксируются из каталога в момент покупки (CR-1) —
+/// последующие правки каталога не меняют проданное.
+/// eventCreditsRemaining поддерживается транзакционно (guarded update);
+/// истина для сверки — granted + Σadjustments − активные consumptions.
+model PlanPurchase {
+  id             String             @id @default(uuid()) @db.Uuid
+  organizationId String             @map("organization_id") @db.Uuid
+  planId         String             @map("plan_id") @db.Uuid
+  orderId        String?            @unique @map("order_id") @db.Uuid
+  status         PlanPurchaseStatus @default(PENDING_PAYMENT)
+
+  planKeySnapshot           PlanKey          @map("plan_key_snapshot")
+  priceAmountMinorSnapshot  BigInt?          @map("price_amount_minor_snapshot")
+  commissionBpsSnapshot     Int              @map("commission_bps_snapshot")
+  eventCreditsGranted       Int              @map("event_credits_granted")
+  eventCreditsRemaining     Int              @map("event_credits_remaining")
+  aiMinutesMonthlySnapshot  Int              @map("ai_minutes_monthly_snapshot")
+  generationCreditsSnapshot Int              @map("generation_credits_snapshot")
+  generationWindowSnapshot  GenerationWindow @map("generation_window_snapshot")
+  staffSeatsSnapshot        Int              @map("staff_seats_snapshot")
+  maxParticipantsSnapshot   Int?             @map("max_participants_snapshot")
+  taskBoardEnabledSnapshot  Boolean          @map("task_board_enabled_snapshot")
+  statsTierSnapshot         StatsTier        @map("stats_tier_snapshot")
+  qrModeSnapshot            QrCheckInMode    @map("qr_mode_snapshot")
+  validityDaysSnapshot      Int?             @map("validity_days_snapshot")
+
+  /// activatedAt + validityDays (§2.1: 90 дней). NULL до активации.
+  activatedAt    DateTime? @map("activated_at")
+  expiresAt      DateTime? @map("expires_at")
+  supersededAt   DateTime? @map("superseded_at")
+  /// Пакет, заменивший этот (смена тарифа §2.4).
+  supersededById String?   @map("superseded_by_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  organization Organization             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan         Plan                     @relation(fields: [planId], references: [id], onDelete: Restrict)
+  order        Order?                   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  supersededBy PlanPurchase?            @relation("PlanPurchaseSupersession", fields: [supersededById], references: [id], onDelete: SetNull)
+  supersedes   PlanPurchase[]           @relation("PlanPurchaseSupersession")
+  consumptions EventCreditConsumption[]
+  adjustments  PlanCreditAdjustment[]
+
+  @@index([organizationId, status])
+  @@index([expiresAt])
+  @@map("plan_purchases")
+}
+
+/// Потребление кредита события (E-16/OQ-A0-6): одна запись на событие —
+/// @@unique([eventId]) даёт идемпотентность «первый переход в PUBLISHED»,
+/// re-publish бесплатен. eventId НАМЕРЕННО без FK: история трат переживает
+/// удаление события. refundedAt — возврат по B-1 (CANCELLED с 0 APPROVED).
+model EventCreditConsumption {
+  id             String    @id @default(uuid()) @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  planPurchaseId String    @map("plan_purchase_id") @db.Uuid
+  eventId        String    @unique @map("event_id") @db.Uuid
+  consumedAt     DateTime  @default(now()) @map("consumed_at")
+  refundedAt     DateTime? @map("refunded_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  planPurchase PlanPurchase @relation(fields: [planPurchaseId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([planPurchaseId])
+  @@map("event_credit_consumptions")
+}
+
+/// Append-only корректировка кредитов пакета (S-3 админ-правки, §2.4 перенос
+/// при смене тарифа, B-1 возврат). Никогда не мутирует прошлые записи;
+/// createdByAdminId — FK-less (SuperAdmin.id, прецедент archivedById).
+model PlanCreditAdjustment {
+  id               String                   @id @default(uuid()) @db.Uuid
+  organizationId   String                   @map("organization_id") @db.Uuid
+  planPurchaseId   String                   @map("plan_purchase_id") @db.Uuid
+  delta            Int
+  kind             PlanCreditAdjustmentKind
+  createdByAdminId String?                  @map("created_by_admin_id") @db.Uuid
+  createdAt        DateTime                 @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  planPurchase PlanPurchase @relation(fields: [planPurchaseId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([planPurchaseId])
+  @@map("plan_credit_adjustments")
+}
+
+/// Ключ энтайтлмента для per-org оверрайда (D-6). Расширение — additive.
+enum EntitlementKey {
+  COMMISSION_BPS
+  STAFF_SEATS
+  MAX_PARTICIPANTS_PER_EVENT
+  GENERATION_CREDITS
+  AI_MINUTES_MONTHLY
+  TASK_BOARD_ENABLED
+  STATS_TIER
+  QR_MODE
+  EVENT_CREDITS
+  /// Override-only лимит на общее число созданных событий (тарифного дефолта нет).
+  MAX_EVENTS
+  /// Per-org включение VIA-платежей (valueBool): true — пилот/тест до общего
+  /// запуска, false — точечное отключение; при отсутствии строки действует
+  /// глобальный тумблер via_payments (platform_config).
+  VIA_PAYMENTS
+}
+
+/// Per-org оверрайд энтайтлмента (D-6): супер-адмнские кастомные капы/комиссия
+/// (S-5/S-6, OQ-7: reason ОБЯЗАТЕЛЕН) и авто-гранты грандфазеринга (D-14,
+/// expiresAt = запуск + 90 дней, решение B-3). Одна активная строка на
+/// (org, key): правка перезаписывает строку, история — в AdminAuditLog
+/// (CAP_OVERRIDE_SET before/after). Значение — ровно одно из value*-полей
+/// по типу ключа: числовые → valueInt, флаги → valueBool, енумы → valueString.
+model EntitlementOverride {
+  id             String         @id @default(uuid()) @db.Uuid
+  organizationId String         @map("organization_id") @db.Uuid
+  key            EntitlementKey
+
+  valueInt    Int?     @map("value_int")
+  valueBool   Boolean? @map("value_bool")
+  valueString String?  @map("value_string")
+
+  reason           String
+  /// FK-less SuperAdmin.id (прецедент archivedById); NULL для системных грантов миграций (D-14).
+  createdByAdminId String?   @map("created_by_admin_id") @db.Uuid
+  expiresAt        DateTime? @map("expires_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, key])
+  @@index([expiresAt])
+  @@map("entitlement_overrides")
+}
+
+/// Маска доступа организации (тонкое управление супер-админа поверх ролей):
+/// наличие строки = право `permissionCode` ЗАКРЫТО для ВСЕЙ организации,
+/// включая владельца (OWNER). Пустая маска = поведение по ролям/тарифу как
+/// раньше (обратная совместимость). Маска только УБИРАЕТ права, никогда не
+/// выдаёт (выдача — управление ролями). История правок — AdminAuditLog
+/// (ACCESS_MASK_SET, before/after списки кодов). createdByAdminId — FK-less
+/// SuperAdmin.id (прецедент archivedById).
+model OrganizationAccessOverride {
+  id               String   @id @default(uuid()) @db.Uuid
+  organizationId   String   @map("organization_id") @db.Uuid
+  /// Код права из каталога PERMISSIONS (например 'events:create').
+  permissionCode   String   @map("permission_code")
+  /// Причина закрытия (необязательна); дублируется в AdminAuditLog.
+  reason           String?
+  createdByAdminId String?  @map("created_by_admin_id") @db.Uuid
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, permissionCode])
+  @@index([organizationId])
+  @@map("organization_access_overrides")
+}
+
+/// Источник списания единицы потребления (OQ-5: сначала квота тарифа, потом монеты).
+enum DrainSource {
+  PLAN_QUOTA
+  COIN
+}
+
+/// Append-only событие потребления (D-7, E-10). Идемпотентность метеринга:
+/// @@unique([organizationId, metric, idempotencyKey]) — повторная попытка с тем
+/// же ключом (ретрай, повторный рендер бейджа PC-8, ретрай settle AI-звонка)
+/// не создаёт вторую запись. periodKey — ленивое окно (CR-6, без планировщика):
+/// 'YYYY-MM' для календарного месяца, 'pack:<purchaseId>' для периода пакета,
+/// 'pack:<purchaseId>:YYYY-MM' для месячных окон AI-минут внутри пакета.
+/// drainSource фиксирует источник НАВСЕГДА — смена политики OQ-5 не
+/// переписывает историю. quantity: AI — секунды (CR-26), генерации — единицы.
+model UsageEvent {
+  id             String      @id @default(uuid()) @db.Uuid
+  organizationId String      @map("organization_id") @db.Uuid
+  metric         CoinMetric
+  quantity       Int
+  idempotencyKey String      @map("idempotency_key")
+  periodKey      String      @map("period_key")
+  drainSource    DrainSource @map("drain_source")
+
+  /// Атрибуция (все FK-less — история переживает удаления).
+  planPurchaseId String? @map("plan_purchase_id") @db.Uuid
+  eventId        String? @map("event_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, metric, idempotencyKey])
+  @@index([organizationId, metric, periodKey])
+  @@map("usage_events")
+}
+
+/// Агрегированный счётчик окна (D-7): горячий путь чтения «сколько потрачено
+/// в этом окне». Поддерживается в одной транзакции с UsageEvent (E-10 guarded
+/// update); UsageEvent — истина для сверки. Сбросов НЕТ — новое окно = новая
+/// строка с новым periodKey (CR-6: ленивое разрешение вместо планировщика).
+model UsageCounter {
+  id             String     @id @default(uuid()) @db.Uuid
+  organizationId String     @map("organization_id") @db.Uuid
+  metric         CoinMetric
+  periodKey      String     @map("period_key")
+  used           Int        @default(0)
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, metric, periodKey])
+  @@map("usage_counters")
+}
+
+/// Вид проводки леджера монет (CR-14; EXPIRY зарезервирован — монеты
+/// бессрочны по OQ-5, additive ALTER TYPE если политика изменится).
+enum CoinLedgerEntryKind {
+  PURCHASE
+  COMP_GRANT
+  CONSUMPTION
+  REVERSAL
+}
+
+/// Append-only леджер монет (D-8, CR-14): каждая проводка несёт balanceAfter —
+/// баланс метрики ПОСЛЕ проводки (горячее чтение = последняя строка), плюс
+/// CHECK (balance_after >= 0) в SQL миграции. SUM(delta) == последний
+/// balanceAfter — инвариант сверки (M-9). Единицы: AI — секунды (CR-26).
+/// Монеты не истекают и переживают смену/истечение тарифа (OQ-5).
+model CoinLedgerEntry {
+  id             String              @id @default(uuid()) @db.Uuid
+  organizationId String              @map("organization_id") @db.Uuid
+  metric         CoinMetric
+  delta          Int
+  balanceAfter   Int                 @map("balance_after")
+  kind           CoinLedgerEntryKind
+
+  /// Атрибуция: покупка (Order), потребление (UsageEvent), comp-грант (админ) — все FK-less.
+  orderId          String? @map("order_id") @db.Uuid
+  usageEventId     String? @map("usage_event_id") @db.Uuid
+  createdByAdminId String? @map("created_by_admin_id") @db.Uuid
+  reason           String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, metric, createdAt])
+  @@map("coin_ledger_entries")
+}
+
+/// Тип строки выручки (D-16/M-15).
+enum RevenueType {
+  PLAN_FEE
+  COMMISSION
+  COIN_PACK
+  ADVERTISING
+  REFUND
+  ADJUSTMENT
+}
+
+/// Канал поступления (S-4 MANUAL в managed-фазе; провайдеры — по мере запуска).
+enum RevenueChannel {
+  MANUAL
+  PAYME
+  CLICK
+  STRIPE
+  VIA
+}
+
+/// Нормализованная строка выручки платформы (D-16, спецификация M-15).
+/// НАМЕРЕННО без FK на Organization (паттерн AdminAuditLog): выручка переживает
+/// hard-delete организации. amountMinor — знаковые тийины/центы (REFUND < 0).
+/// Tenant-guard: документированное исключение — платформенные данные, читает
+/// только супер-админ (S-10); в tenant-списки НЕ входит.
+model RevenueEntry {
+  id                String         @id @default(uuid()) @db.Uuid
+  organizationRef   String         @map("organization_ref") @db.Uuid
+  organizationLabel String?        @map("organization_label")
+  type              RevenueType
+  channel           RevenueChannel
+  amountMinor       BigInt         @map("amount_minor")
+  currency          Currency       @default(UZS)
+  /// Ссылка на источник: orderId / providerTxnId / planPurchaseId.
+  sourceRef         String?        @map("source_ref")
+  occurredAt        DateTime       @default(now()) @map("occurred_at")
+  createdAt         DateTime       @default(now()) @map("created_at")
+
+  @@index([organizationRef])
+  @@index([type, occurredAt])
+  @@index([channel, occurredAt])
+  @@map("revenue_entries")
+}
+
+/// Платформенный key-value конфиг (D-17): персистентность для S-19 —
+/// мастер-переключателя тарифной системы (BILLING_SWITCH_TOGGLE в аудите).
+/// Глобальная модель (не tenant). Ключи — snake_case, значения — JSON.
+model PlatformConfig {
+  key              String   @id
+  value            Json
+  updatedByAdminId String?  @map("updated_by_admin_id") @db.Uuid
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("platform_config")
+}
+
+/// Статус выплаты организатору (M-7).
+enum PayoutStatus {
+  PENDING
+  PAID
+}
+
+/// Выплата организатору (M-7, мерчант-оф-рекорд по решению C-1): тело билетов
+/// минус комиссия платформы. Managed-фаза — ручные выплаты по runbook
+/// (docs/monetization/15-payout-runbook.md); автоматизация — P2 (M-7-auto).
+model Payout {
+  id             String       @id @default(uuid()) @db.Uuid
+  organizationId String       @map("organization_id") @db.Uuid
+  amountMinor    BigInt       @map("amount_minor")
+  currency       Currency     @default(UZS)
+  status         PayoutStatus @default(PENDING)
+  /// Референс банковской платёжки выплаты (обязателен при PAID).
+  externalRef    String?      @map("external_ref")
+  /// FK-less SuperAdmin.id (прецедент archivedById).
+  markedPaidById String?      @map("marked_paid_by_id") @db.Uuid
+  markedPaidAt   DateTime?    @map("marked_paid_at")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, status])
+  @@map("payouts")
+}
+
+/// Статус рекламного размещения (D-10/M-11).
+enum AdOrderStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+/// Рекламное размещение (D-10): фулфилмент featured-плейсмента и кампаний.
+/// Создаётся оператором (S-11) при фулфилменте оплаченного ADVERTISING-заказа
+/// или как $0 comp (грандфазер существующих featured — решение D-3 группы D).
+/// placementEnd NULL = бессрочно (comp). Снятие по истечении — свип E-11b.
+model AdOrder {
+  id             String        @id @default(uuid()) @db.Uuid
+  organizationId String        @map("organization_id") @db.Uuid
+  /// Оплаченный заказ-основание; NULL для comp-грандфазера.
+  orderId        String?       @unique @map("order_id") @db.Uuid
+  /// Продвигаемое событие (featured). Для email-кампаний может быть NULL.
+  eventId        String?       @map("event_id") @db.Uuid
+  skuCode        String        @map("sku_code")
+  status         AdOrderStatus @default(ACTIVE)
+  /// $0 comp-размещение (грандфазер/goodwill) — честный след в данных.
+  isComp         Boolean       @default(false) @map("is_comp")
+
+  placementStart DateTime  @default(now()) @map("placement_start")
+  placementEnd   DateTime? @map("placement_end")
+
+  createdByAdminId String?  @map("created_by_admin_id") @db.Uuid
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  order        Order?       @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  event        Event?       @relation(fields: [eventId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, status])
+  @@index([status, placementEnd])
+  @@map("ad_orders")
+}
+
+// ============================================================================
+// СБОРКИ МОБИЛЬНОГО ПРИЛОЖЕНИЯ (внутренняя дистрибуция для команды).
+// Файлы лежат в приватном сторадже (APP_BUILDS_DIR), доступ только SUPER_ADMIN.
+
+enum AppBuildPlatform {
+  ANDROID
+  IOS
+}
+
+model AppBuild {
+  id              String           @id @default(uuid()) @db.Uuid
+  platform        AppBuildPlatform
+  version         String // человекочитаемая версия, например "0.1.0 (42)"
+  notes           String?
+  originalName    String           @map("original_name")
+  // Относительный путь внутри приватного стораджа (не публичный URL).
+  storedPath      String           @map("stored_path")
+  mimeType        String           @map("mime_type")
+  size            Int
+  uploadedById    String?          @map("uploaded_by_id") @db.Uuid
+  uploadedByEmail String?          @map("uploaded_by_email")
+  createdAt       DateTime         @default(now()) @map("created_at")
+
+  @@index([platform])
+  @@index([createdAt])
+  @@map("app_builds")
+}
+
+// Платформенные key-value настройки супер-админа (первый потребитель —
+// пароль приватной инвесторской страницы). Значения не секретны в смысле
+// криптографии: это управляемые из админки shared-секреты и флаги.
+model PlatformSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("platform_settings")
+}
+
+// ============================================================================
+// ПРОГРАММА УВЕДОМЛЕНИЙ (docs/notifications/DATA_MODEL_DELTA.md).
+// Только аддитивные сущности: push-токены, преференсы, журнал доставок,
+// планировщик и участнический in-app инбокс.
+
+/// Push-токен устройства. Привязка к Account (единая identity), не к
+/// User/OrganizationMember: устройство одно, workspace — атрибут сессии.
+/// expoPushToken НЕ unique: один девайс с двумя аккаунтами даёт две строки —
+/// прежнюю гасим по receipt'ам DeviceNotRegistered, не по constraint'у.
+model DeviceToken {
+  id             String    @id @default(uuid()) @db.Uuid
+  accountId      String    @map("account_id") @db.Uuid
+  /// Клиентский uuid установки (SecureStore). Пара (account, installation) —
+  /// identity устройства; expoPushToken — ротируемое значение.
+  installationId String    @map("installation_id") @db.Uuid
+  expoPushToken  String    @map("expo_push_token")
+  platform       String // 'ios' | 'android'
+  /// Локаль интерфейса на устройстве — ЕДИНСТВЕННЫЙ способ локализовать
+  /// killed-push (сервер собирает текст пуша; см. audit/mobile.md).
+  locale         String    @default("ru") // 'ru' | 'uz' | 'en'
+  appVersion     String?   @map("app_version")
+  osVersion      String?   @map("os_version")
+  lastSeenAt     DateTime  @default(now()) @map("last_seen_at")
+  disabledAt     DateTime? @map("disabled_at")
+  /// 'logout' | 'device_not_registered' — источник деактивации, для диагностики.
+  disabledReason String?   @map("disabled_reason")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, installationId]) // ключ PUT-upsert'а
+  @@index([accountId, disabledAt]) // fan-out: активные токены аккаунта
+  @@index([expoPushToken]) // обратный поиск по receipt'у DeviceNotRegistered
+  @@index([lastSeenAt]) // stale-reaper (90д не шлём / 180д hard-cleanup строк)
+  @@map("device_tokens")
+}
+
+/// Матрица преференсов. Строка существует только при отклонении от дефолта
+/// (дефолты — в коде, GET мёржит). In-app канала в матрице нет намеренно:
+/// лента дешёвая и не отключается. EmailUnsubscribe не трогается — законный
+/// one-click механизм поверх матрицы (проверяются оба).
+model NotificationPreference {
+  id        String   @id @default(uuid()) @db.Uuid
+  accountId String   @map("account_id") @db.Uuid
+  /// PreferenceKey из CONTRACT_DIFF §2: event_reminders | saved_event_alerts |
+  /// registration_status | summary | organizer_registrations | organizer_broadcast.
+  /// String, не enum БД: добавление ключа не требует миграции (валидация в DTO).
+  key       String
+  push      Boolean  @default(true)
+  email     Boolean  @default(true)
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, key])
+  @@map("notification_preferences")
+}
+
+/// Журнал доставок + замок идемпотентности. FK намеренно не объявляются
+/// (только uuid-колонки + индексы): журнал должен переживать удаление
+/// событий/регистраций — Cascade стёр бы историю доставок.
+model NotificationDelivery {
+  id             String    @id @default(uuid()) @db.Uuid
+  /// Ключ идемпотентности (форматы — в NOTIFICATIONS_CATALOG). Уникален в
+  /// связке (dedupKey, accountId, channel) — решение BL-01: один логический
+  /// ключ порождает по строке на получателя и канал; рестарт воркера/двойной
+  /// вызов → P2002 → noop.
+  dedupKey       String    @map("dedup_key")
+  /// ID из NOTIFICATIONS_CATALOG (напр. 'REM-01') — связь доставки с каталогом.
+  catalogId      String    @map("catalog_id")
+  channel        String // 'push' | 'email' | 'in_app'
+  /// Получатель: ровно одно из двух заполнено.
+  accountId      String?   @map("account_id") @db.Uuid
+  /// Для организаторских in-app без персональной адресации — организация.
+  organizationId String?   @map("organization_id") @db.Uuid
+  /// Денормализованные ссылки для каскадной инвалидации и диагностики.
+  eventId        String?   @map("event_id") @db.Uuid
+  registrationId String?   @map("registration_id") @db.Uuid
+  orderId        String?   @map("order_id") @db.Uuid
+  status         String    @default("enqueued")
+  // 'scheduled' | 'enqueued' | 'sent' | 'delivered' | 'failed' | 'cancelled'
+  // | 'skipped' | 'suppressed_rate_limit' | 'suppressed_preference' | 'suppressed_unsubscribe'
+  /// Снапшот аргументов шаблона (payload пуша) — для ресенда и разбора инцидентов.
+  payload        Json?
+  error          String?   @db.Text
+  /// Expo push ticket id — для сверки receipts.
+  providerRef    String?   @map("provider_ref")
+  scheduledFor   DateTime? @map("scheduled_for")
+  sentAt         DateTime? @map("sent_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  @@unique([dedupKey, accountId, channel])
+  @@index([accountId, createdAt])
+  @@index([eventId])
+  @@index([registrationId])
+  @@index([status, createdAt]) // reaper «застрявших enqueued» + failed-мониторинг
+  @@index([catalogId, createdAt]) // аналитика по типам
+  @@map("notification_deliveries")
+}
+
+/// Плановые уведомления: источник истины — БД, не Redis (flush BullMQ не
+/// должен терять напоминания). Repeatable-воркер выбирает due-строки
+/// (SELECT … FOR UPDATE SKIP LOCKED), прогоняет guard и создаёт
+/// NotificationDelivery + канальные job'ы. FK не объявляются — как у Delivery.
+model ScheduledNotification {
+  id             String    @id @default(uuid()) @db.Uuid
+  catalogId      String    @map("catalog_id") // 'REM-01', 'CLS-01', 'SUM-02', 'MOD-03', 'REG-03'…
+  /// Совпадает с будущим dedupKey доставки — планировщик идемпотентен:
+  /// повторное планирование того же ключа → upsert-noop.
+  dedupKey       String    @unique @map("dedup_key")
+  runAt          DateTime  @map("run_at") // UTC-момент; TZ-математика — при планировании
+  status         String    @default("scheduled") // 'scheduled' | 'dispatched' | 'cancelled' | 'skipped'
+  /// Каскадная инвалидация (инвариант №3): cancelBy({eventId|registrationId|orderId}).
+  eventId        String?   @map("event_id") @db.Uuid
+  registrationId String?   @map("registration_id") @db.Uuid
+  orderId        String?   @map("order_id") @db.Uuid
+  accountId      String?   @map("account_id") @db.Uuid
+  organizationId String?   @map("organization_id") @db.Uuid
+  /// Контекст для guard-проверки и построения текста в момент исполнения
+  /// (например eventVersion, offsetKey, threshold).
+  context        Json?
+  cancelledAt    DateTime? @map("cancelled_at")
+  cancelReason   String?   @map("cancel_reason")
+  dispatchedAt   DateTime? @map("dispatched_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  @@index([status, runAt]) // тик планировщика: WHERE status='scheduled' AND run_at <= now()
+  @@index([eventId, status]) // каскадная отмена по событию
+  @@index([registrationId, status]) // …по регистрации
+  @@index([orderId, status]) // …по заказу (payment-цепочка)
+  @@map("scheduled_notifications")
+}
+
+/// Участнический in-app инбокс. Отдельная таблица, а не расширение
+/// Notification: у того organizationId NOT NULL + Cascade FK — участнику
+/// организация не нужна, а снятие constraint'а не аддитивно. Та же философия:
+/// type+payload, никаких готовых фраз; персональный readAt с рождения.
+model AccountNotification {
+  id         String    @id @default(uuid()) @db.Uuid
+  accountId  String    @map("account_id") @db.Uuid
+  /// AccountNotificationType из CONTRACT_DIFF §5. String в БД (не enum) —
+  /// добавление типа без миграции; контрактная валидация в DTO.
+  type       String
+  entityType String?   @map("entity_type")
+  entityId   String?   @map("entity_id") @db.Uuid
+  /// Подстановки для локализованной строки. Никаких готовых фраз (принцип Notification).
+  payload    Json?
+  readAt     DateTime? @map("read_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId, createdAt]) // лента
+  @@index([accountId, readAt]) // unread-count
+  @@map("account_notifications")
+}
+
+/// Short-lived, single-use bridge for native OAuth. Bearer tokens are never
+/// placed in a redirect URL and are encrypted at rest until atomic exchange.
+model MobileOAuthExchange {
+  id         String   @id @default(uuid()) @db.Uuid
+  codeHash   String   @unique @map("code_hash")
+  ciphertext String   @db.Text
+  iv         String
+  authTag    String   @map("auth_tag")
+  expiresAt  DateTime @map("expires_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([expiresAt])
+  @@map("mobile_oauth_exchanges")
+}

@@ -1,0 +1,21 @@
+{
+  "name": "@eventflow/eslint-config",
+  "private": true,
+  "version": "0.1.0",
+  "license": "SEE LICENSE IN LICENSE",
+  "type": "module",
+  "exports": {
+    "./base": "./base.mjs"
+  },
+  "files": [
+    "base.mjs"
+  ],
+  "dependencies": {
+    "@eslint/js": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "typescript-eslint": "^8.46.2"
+  },
+  "peerDependencies": {
+    "eslint": ">=9.0.0"
+  }
+}

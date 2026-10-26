@@ -1,0 +1,27 @@
+export const confirmations = {
+    cancelRegistration: {
+        title: "Отменить регистрацию?",
+        description: "Вы будете удалены из списка участников. Вы сможете зарегистрироваться снова, если останутся места.",
+        confirm: "Да, отменить",
+        keep: "Оставить регистрацию",
+    },
+    deleteComment: {
+        title: "Удалить комментарий?",
+        description: "Это действие нельзя отменить.",
+        confirm: "Удалить",
+        keep: "Оставить",
+    },
+    unsaveEvent: {
+        title: "Убрать из сохранённых?",
+        description: "Мероприятие исчезнет из списка сохранённых.",
+        confirm: "Убрать",
+        keep: "Оставить",
+    },
+    unsubscribe: {
+        title: "Отписаться от организатора?",
+        description: "Вы перестанете получать обновления о новых мероприятиях.",
+        confirm: "Отписаться",
+        keep: "Остаться подписанным",
+    },
+};
+//# sourceMappingURL=confirmations.js.map

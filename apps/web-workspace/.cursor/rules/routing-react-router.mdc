@@ -1,0 +1,33 @@
+---
+description: Конвенции роутинга для web-workspace (React Router DOM 7)
+globs:
+  - "src/app/providers/router/**/*"
+  - "src/pages/**/*"
+alwaysApply: false
+---
+
+# Правила
+
+- Используем объектные маршруты и `createBrowserRouter`.
+- Придерживайся текущего паттерна: lazy pages + обёртка `withSuspense(...)`.
+- `errorElement` должен быть задан на верхних ветках роутера.
+- 404 и fallback-страницы должны оставаться отдельными страницами.
+- Для загрузки данных по умолчанию используй TanStack Query, а не RTK Query.
+- `loaders/actions` не внедряй без необходимости: текущий проект в основном работает через query hooks внутри страниц и features.
+
+# Шаблон
+
+```tsx
+// app/providers/router/index.tsx
+import { createBrowserRouter } from "react-router-dom";
+import { lazy } from "react";
+
+const HomePage = lazy(() => import("@pages/home"));
+const UsersPage = lazy(() => import("@pages/users"));
+
+export const router = createBrowserRouter([
+  { path: "/", element: <HomePage />, errorElement: <ErrorPage /> },
+  { path: "/users", element: <UsersPage /> },
+  { path: "*", element: <NotFoundPage /> },
+]);
+```

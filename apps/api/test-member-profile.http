@@ -1,0 +1,58 @@
+### Тестирование профиля сотрудника организации
+
+@baseUrl = http://localhost:3000/api/v1
+@memberToken = YOUR_MEMBER_TOKEN_HERE
+
+### 1. Вход сотрудника по ИНН организации
+POST {{baseUrl}}/auth/member/login
+Content-Type: application/json
+
+{
+  "inn": "1234567890",
+  "email": "member@company.com",
+  "password": "SecurePassword123"
+}
+
+### 2. Получить свой профиль
+GET {{baseUrl}}/workspace/members/me
+Authorization: Bearer {{memberToken}}
+
+### 3. Обновить профиль
+PATCH {{baseUrl}}/workspace/members/me
+Authorization: Bearer {{memberToken}}
+Content-Type: application/json
+
+{
+  "firstName": "Иван",
+  "lastName": "Иванов",
+  "phone": "+998901234567",
+  "position": "Senior Event Manager",
+  "department": "Events Department",
+  "bio": "Опытный менеджер событий с 5-летним стажем",
+  "location": "Ташкент, Узбекистан"
+}
+
+### 4. Обновить настройки приватности
+PATCH {{baseUrl}}/workspace/members/me/privacy
+Authorization: Bearer {{memberToken}}
+Content-Type: application/json
+
+{
+  "isPublicProfile": true,
+  "showEmail": true,
+  "showPhone": false
+}
+
+### 5. Получить свои права доступа
+GET {{baseUrl}}/workspace/members/me/permissions
+Authorization: Bearer {{memberToken}}
+
+### 6. Загрузить аватар (multipart/form-data)
+# Используйте Postman или curl для загрузки файла:
+# curl -X POST "{{baseUrl}}/workspace/members/me/avatar" \
+#   -H "Authorization: Bearer {{memberToken}}" \
+#   -F "avatar=@/path/to/avatar.jpg"
+
+### 7. Удалить аватар
+DELETE {{baseUrl}}/workspace/members/me/avatar
+Authorization: Bearer {{memberToken}}

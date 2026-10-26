@@ -1,0 +1,37 @@
+---
+description: Конвенции API для web-workspace
+globs:
+  - "src/shared/api/**/*"
+  - "src/features/**/*"
+  - "src/entities/**/*"
+alwaysApply: true
+---
+
+API-слой `web-workspace` уже организован вокруг `src/api/` и query-хуков в `src/features/**/api`.
+
+## Базовые правила
+
+- Базовые typed-сервисы храни в `src/api/services/`.
+- Общий клиент и конфиг — в `src/api/apiClient.ts`, `src/api/config.ts`, `src/api/sdk.ts`.
+- Query и mutation hooks держи рядом с доменной областью в `src/features/**/api`.
+- Перед созданием нового клиента или типов проверь существующие сервисы и `@eventflow/sdk-workspace`.
+
+## Что предпочитать
+
+- TanStack Query для server state.
+- Небольшие сервисы по доменам: `eventsService.ts`, `boardsService.ts`, `tasksService.ts`.
+- Строгие request/response типы рядом с сервисами.
+- Query keys и invalidation в стиле соседних feature hooks.
+
+## Новый API-код должен
+
+- переиспользовать существующий `apiClient`
+- не дублировать endpoint, который уже описан в `src/api/services`
+- использовать TanStack Query hooks рядом с конкретной фичей
+- соблюдать текущие env и auth flow приложения
+
+## Не делай по умолчанию
+
+- не вводи RTK Query или новый API framework
+- не создавай второй параллельный `src/shared/api` для тех же задач
+- не переноси без необходимости feature-специфичные hooks обратно в общий слой

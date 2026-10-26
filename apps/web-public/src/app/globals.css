@@ -1,0 +1,736 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* Сильная кривая для входов/выходов оверлеев: утилита ease-out-expo
+   выставляет --tw-ease, который читают animate-in/out из tw-animate-css. */
+@theme {
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ============================================================
+   Eventflow Public — Design Tokens
+   Bone-and-ink editorial. Cool bone canvas, graphite type,
+   electric ember accent. Formal but young — high contrast,
+   sharp 6px corners, generous space.
+
+   Source of truth: design bundle `colors_and_type.css`
+   (Fraunces replaced by Space Grotesk for display/inflection).
+   ============================================================ */
+
+:root {
+  color-scheme: light;
+
+  /* ---------- BRAND ---------- */
+  --brand-primary: #ea580c;
+  --brand-primary-hover: #f26b25;
+  --brand-primary-press: #c64a07;
+
+  /* Logo (unchanged — yellow→orange dot pulse, ember wordmark) */
+  --logo-yellow: #fffd00;
+  --logo-orange: #ff6f00;
+
+  /* ---------- BONE CANVAS (cool off-white) ---------- */
+  --bone-50:  #ffffff;
+  --bone-100: #fbfbfa;   /* page */
+  --bone-200: #f5f5f3;   /* card */
+  --bone-300: #ececea;   /* sunken / sidebar */
+  --bone-400: #dcdcda;   /* divider */
+
+  /* ---------- GRAPHITE INK ---------- */
+  --ink-50:  #8a8a87;    /* placeholder */
+  --ink-100: #6f6f6c;    /* meta */
+  --ink-200: #4a4a47;    /* secondary */
+  --ink-300: #2a2a28;    /* primary heading alt */
+  --ink-400: #0e0e0d;    /* deepest ink */
+
+  /* ---------- ELECTRIC ACCENTS — EMBER (sharp, modern) ---------- */
+  --ember-50:  #fff3eb;
+  --ember-100: #ffe1cc;
+  --ember-200: #ffba85;
+  --ember-300: #fb893f;
+  --ember-400: #ea580c;   /* primary */
+  --ember-500: #c64a07;
+  --ember-600: #963405;
+
+  /* ---------- FOREST — secondary editorial accent ---------- */
+  --forest-50:  #eef3ef;
+  --forest-100: #d2e0d4;
+  --forest-200: #a4c0a8;
+  --forest-300: #6e9a76;
+  --forest-400: #3f7048;   /* secondary */
+  --forest-500: #275235;
+  --forest-600: #173626;
+
+  /* ---------- ROLES ---------- */
+  --bg-1: var(--bone-100);
+  --bg-2: var(--bone-50);
+  --bg-3: var(--bone-200);
+  --fg-1: var(--ink-400);
+  --fg-2: var(--ink-200);
+  --fg-3: var(--ink-100);
+  --fg-4: var(--ink-50);
+
+  /* ---------- BORDERS ---------- */
+  --border-1: rgba(14, 14, 13, 0.08);
+  --border-2: rgba(14, 14, 13, 0.16);
+  --border-strong: rgba(14, 14, 13, 0.32);
+
+  /* ---------- STATUS ---------- */
+  --success: #1f7a3f;
+  --success-soft: #d8ebe0;
+  --warning: #b8860b;
+  --warning-soft: #f6e6bf;
+  --danger:  #c2270e;
+  --danger-hover: #d83815;
+  --danger-press: #971c08;
+  --danger-soft:  #f9d6cf;
+  --info:    #3f7048;
+  --info-soft:    #d2e0d4;
+
+  /* ---------- TYPOGRAPHY ---------- */
+  /* Wired by next/font in [locale]/layout.tsx — these aliases stay
+     so static CSS authoring still resolves consistently. */
+  --font-sans:
+    var(--font-manrope-next, "Manrope"),
+    -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-display:
+    var(--font-space-grotesk-next, "Space Grotesk"),
+    "Manrope", -apple-system, system-ui, sans-serif;
+  --font-mono:
+    var(--font-jetbrains-mono-next, "JetBrains Mono"),
+    ui-monospace, "SF Mono", Menlo, monospace;
+
+  --text-xs: 12px; --text-sm: 14px; --text-base: 16px;
+  --text-md: 18px; --text-lg: 20px; --text-xl: 24px;
+  --text-2xl: 30px; --text-3xl: 38px; --text-4xl: 48px;
+  --text-5xl: 64px; --text-6xl: 84px;
+  --text-display: clamp(64px, 9vw, 132px);
+
+  --w-light: 300; --w-regular: 400; --w-medium: 500;
+  --w-semibold: 600; --w-bold: 700; --w-extrabold: 800;
+
+  --track-tight: -0.035em; --track-snug: -0.02em;
+  --track-normal: -0.01em; --track-wide: 0.04em;
+  --track-eyebrow: 0.18em;
+
+  --lh-tight: 1.0; --lh-snug: 1.15;
+  --lh-normal: 1.5; --lh-relaxed: 1.6;
+
+  /* ---------- SPACING (4px base grid) ---------- */
+  --space-1: 4px; --space-2: 8px; --space-3: 12px;
+  --space-4: 16px; --space-5: 20px; --space-6: 24px;
+  --space-8: 32px; --space-10: 40px; --space-12: 48px;
+  --space-16: 64px; --space-20: 80px; --space-24: 96px; --space-32: 128px;
+
+  /* ---------- RADII (sharp, modern editorial) ---------- */
+  --radius-xs: 2px; --radius-sm: 4px; --radius-md: 6px;
+  --radius-lg: 8px; --radius-xl: 12px; --radius-2xl: 16px;
+  --radius-pill: 999px;
+
+  /* ---------- SHADOWS (cool, soft) ---------- */
+  --shadow-xs: 0 1px 2px rgba(14, 14, 13, 0.05);
+  --shadow-sm: 0 2px 6px rgba(14, 14, 13, 0.05), 0 1px 2px rgba(14, 14, 13, 0.04);
+  --shadow-md: 0 14px 32px rgba(14, 14, 13, 0.08), 0 2px 6px rgba(14, 14, 13, 0.04);
+  --shadow-lg: 0 32px 60px rgba(14, 14, 13, 0.12), 0 4px 12px rgba(14, 14, 13, 0.06);
+  --shadow-glow-warm: 0 12px 32px -8px rgba(234, 88, 12, 0.4);
+
+  /* ---------- MOTION ---------- */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 400ms;
+  --dur-slower: 700ms;
+
+  /* ---------- Z-INDEX SCALE ---------- */
+  --z-base: 0;
+  --z-sticky: 50;
+  --z-overlay: 100;
+  --z-modal: 200;
+  --z-toast: 300;
+
+}
+
+/* ============================================================
+   Tailwind v4 theme registration — exposes tokens as utilities.
+   ============================================================ */
+@theme inline {
+  /* Bone canvas */
+  --color-bone-50:  var(--bone-50);
+  --color-bone-100: var(--bone-100);
+  --color-bone-200: var(--bone-200);
+  --color-bone-300: var(--bone-300);
+  --color-bone-400: var(--bone-400);
+
+  /* Graphite ink */
+  --color-ink-50:  var(--ink-50);
+  --color-ink-100: var(--ink-100);
+  --color-ink-200: var(--ink-200);
+  --color-ink-300: var(--ink-300);
+  --color-ink-400: var(--ink-400);
+
+  /* Ember accent */
+  --color-ember-50:  var(--ember-50);
+  --color-ember-100: var(--ember-100);
+  --color-ember-200: var(--ember-200);
+  --color-ember-300: var(--ember-300);
+  --color-ember-400: var(--ember-400);
+  --color-ember-500: var(--ember-500);
+  --color-ember-600: var(--ember-600);
+
+  /* Forest secondary */
+  --color-forest-50:  var(--forest-50);
+  --color-forest-100: var(--forest-100);
+  --color-forest-200: var(--forest-200);
+  --color-forest-300: var(--forest-300);
+  --color-forest-400: var(--forest-400);
+  --color-forest-500: var(--forest-500);
+  --color-forest-600: var(--forest-600);
+
+  /* Status */
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-hover: var(--danger-hover);
+  --color-danger-press: var(--danger-press);
+  --color-danger-soft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+
+  /* Fonts */
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
+
+  /* Radii */
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
+  --radius-pill: var(--radius-pill);
+
+  /* Shadows */
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-glow-warm: var(--shadow-glow-warm);
+
+  /* Misc */
+  --border-glass: var(--border-1);
+}
+
+/* ============================================================
+   Base layer — body defaults, focus, headings.
+   ============================================================ */
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--bg-1);
+  color: var(--fg-1);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv11";
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection,
+*::selection {
+  background-color: var(--ink-400);
+  color: var(--bone-50);
+  text-shadow: none;
+}
+::-moz-selection,
+*::-moz-selection {
+  background-color: var(--ink-400);
+  color: var(--bone-50);
+  text-shadow: none;
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--bone-400);
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-50);
+  background-clip: content-box;
+}
+
+@layer base {
+  * { @apply border-transparent outline-transparent; }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
+
+  body { @apply bg-transparent; color: var(--ink-400); }
+
+  /* Focus — 3px ember ring, never invisible. */
+  :focus-visible {
+    outline: 2px solid var(--ember-400);
+    outline-offset: 2px;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5vw + 1.5rem, 3.75rem);
+    line-height: 1.1;
+  }
+
+  h2 { font-size: clamp(1.25rem, 2vw + 1rem, 1.5rem); }
+
+  p { text-wrap: pretty; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* ============================================================
+   Utility layer.
+   ============================================================ */
+
+@layer utilities {
+  /* Touch-friendly minimums */
+  .touch-target { min-height: 44px; min-width: 44px; }
+  .touch-target-sm { min-height: 36px; min-width: 36px; }
+
+  /* Safe area support */
+  .safe-top { padding-top: env(safe-area-inset-top); }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  .safe-left { padding-left: env(safe-area-inset-left); }
+  .safe-right { padding-right: env(safe-area-inset-right); }
+  .safe-x {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  .safe-y {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Scroll snap */
+  .snap-x-mandatory {
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+  .snap-x-mandatory > * { scroll-snap-align: start; }
+
+  /* Skeleton */
+  .skeleton {
+    background: linear-gradient(90deg, var(--bone-200) 0%, var(--bone-100) 50%, var(--bone-200) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.8s ease-in-out infinite;
+  }
+
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+}
+
+/* ============================================================
+   Editorial typography utility classes (mirror colors_and_type.css).
+   ============================================================ */
+.t-eyebrow {
+  font: var(--w-medium) var(--text-xs)/1.4 var(--font-sans);
+  letter-spacing: var(--track-eyebrow);
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+.t-display {
+  font: var(--w-light) var(--text-display)/var(--lh-tight) var(--font-display);
+  font-style: italic;
+  letter-spacing: var(--track-tight);
+  text-wrap: balance;
+  color: var(--fg-1);
+}
+.t-h1 {
+  font: var(--w-bold) var(--text-5xl)/var(--lh-tight) var(--font-sans);
+  letter-spacing: var(--track-tight);
+  text-wrap: balance;
+}
+.t-h2 {
+  font: var(--w-bold) var(--text-4xl)/var(--lh-snug) var(--font-sans);
+  letter-spacing: var(--track-snug);
+  text-wrap: balance;
+}
+.t-h3 {
+  font: var(--w-semibold) var(--text-3xl)/var(--lh-snug) var(--font-sans);
+  letter-spacing: var(--track-snug);
+}
+.t-h4 {
+  font: var(--w-semibold) var(--text-2xl)/var(--lh-snug) var(--font-sans);
+  letter-spacing: var(--track-normal);
+}
+.t-h5 {
+  font: var(--w-semibold) var(--text-xl)/var(--lh-snug) var(--font-sans);
+}
+.t-lead {
+  font: var(--w-regular) var(--text-lg)/var(--lh-relaxed) var(--font-sans);
+  color: var(--fg-2);
+  text-wrap: pretty;
+}
+.t-body {
+  font: var(--w-regular) var(--text-base)/var(--lh-relaxed) var(--font-sans);
+  text-wrap: pretty;
+}
+.t-meta {
+  font: var(--w-medium) var(--text-sm)/1.5 var(--font-sans);
+  color: var(--fg-3);
+}
+.t-mono {
+  font: var(--w-medium) var(--text-sm)/1.5 var(--font-mono);
+  letter-spacing: 0;
+}
+.t-label {
+  font: var(--w-semibold) var(--text-xs)/1.4 var(--font-sans);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Container — marketing max 1200, app max via .container-app. */
+.container {
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  max-width: 1200px;
+  padding-left: max(var(--space-6), env(safe-area-inset-left));
+  padding-right: max(var(--space-6), env(safe-area-inset-right));
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding-left: var(--space-8);
+    padding-right: var(--space-8);
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding-left: var(--space-12);
+    padding-right: var(--space-12);
+  }
+}
+
+.container-app {
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  max-width: 1440px;
+  padding-left: max(var(--space-6), env(safe-area-inset-left));
+  padding-right: max(var(--space-6), env(safe-area-inset-right));
+  box-sizing: border-box;
+}
+
+/* Public marketing container variants (Calm Marketplace).
+ * narrow: editorial/centered hero/manifesto/testimonial
+ * wide:   header/footer/catalog/grid/dense product surfaces
+ * Both share the same responsive gutter recipe as .container.
+ */
+.container-narrow,
+.container-wide {
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  padding-left: max(var(--space-6), env(safe-area-inset-left));
+  padding-right: max(var(--space-6), env(safe-area-inset-right));
+  box-sizing: border-box;
+}
+.container-narrow { max-width: 1100px; }
+.container-wide { max-width: 1320px; }
+
+@media (min-width: 768px) {
+  .container-narrow,
+  .container-wide {
+    padding-left: var(--space-8);
+    padding-right: var(--space-8);
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-narrow,
+  .container-wide {
+    padding-left: var(--space-12);
+    padding-right: var(--space-12);
+  }
+}
+
+#__next { isolation: isolate; }
+
+/* Header / dropdown layering */
+.header-layer { z-index: 1000; }
+.header-dropdown-overlay { z-index: 1001; }
+.header-dropdown-panel { z-index: 1002; }
+
+/* Public landing header height — used by every page that pins its own
+   sub-navbar (about / blog / organizers / organizer-public / blog detail).
+   The landing header is `sticky top-0` with `py-3.5` around content that
+   maxes out at the auth pill / chip, measuring ~73px tall including the
+   1px border-bottom. Sub-navbars MUST stick at this offset, otherwise
+   they slide under the header (higher z-index) and the top edge is clipped. */
+:root { --public-header-h: 73px; }
+
+/* Card shadows */
+.card-shadow { box-shadow: var(--shadow-sm); }
+.card-shadow-hover { box-shadow: var(--shadow-md); }
+
+/* Interactive link underline (editorial) */
+.link-underline { position: relative; }
+.link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: -2px;
+  width: 100%; height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform var(--dur-slow) var(--ease-standard);
+}
+.link-underline:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Skip link — off-canvas until keyboard focus, then a visible chip. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 1100;
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  left: var(--space-4);
+  top: var(--space-4);
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-2);
+  background: var(--bone-50);
+  color: var(--ink-400);
+  font: var(--w-semibold) 14px/1 var(--font-sans);
+  box-shadow: var(--shadow-md);
+}
+
+/* Section heading (legacy — no left stripe per spec) */
+.section-heading-accent {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.section-subtitle {
+  margin-top: 0.5rem;
+  font-size: var(--text-sm);
+  line-height: var(--lh-normal);
+  color: var(--fg-3);
+}
+
+/* Hairline divider */
+.section-divider {
+  height: 1px;
+  width: 100%;
+  flex-shrink: 0;
+  background: var(--border-1);
+}
+
+/* Empty state */
+.empty-state-container {
+  border: 1px dashed var(--border-2);
+  border-radius: var(--radius-lg);
+  background-color: var(--bone-200);
+}
+
+.decorative-blob { display: none; }
+
+/* Section vertical rhythm */
+.section-spacing {
+  padding-top: var(--space-12);
+  padding-bottom: var(--space-12);
+}
+
+@media (min-width: 640px) {
+  .section-spacing {
+    padding-top: var(--space-16);
+    padding-bottom: var(--space-16);
+  }
+}
+
+@media (min-width: 768px) {
+  .section-spacing {
+    padding-top: var(--space-20);
+    padding-bottom: var(--space-20);
+  }
+}
+
+@media (min-width: 1024px) {
+  .section-spacing {
+    padding-top: var(--space-24);
+    padding-bottom: var(--space-24);
+  }
+}
+
+/* Swiper alignment for collections rail */
+.collections-swiper .swiper-container-left-aligned {
+  padding-left: max(1rem, calc((100vw - 1200px) / 2 + 1rem));
+  padding-right: 1rem;
+  overflow: visible !important;
+}
+
+.collections-swiper .swiper-container-left-aligned .swiper-wrapper,
+.collections-swiper .swiper-container-left-aligned .swiper-slide {
+  overflow: visible !important;
+}
+
+.collections-swiper .swiper-container-left-aligned .swiper-slide { height: auto; }
+
+@media (min-width: 640px) {
+  .collections-swiper .swiper-container-left-aligned {
+    padding-left: max(1.5rem, calc((100vw - 1200px) / 2 + 1.5rem));
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .collections-swiper .swiper-container-left-aligned {
+    padding-left: max(2rem, calc((100vw - 1200px) / 2 + 2rem));
+    padding-right: 2rem;
+  }
+}
+
+/* ================================================================
+   Premium e-ticket — graphite + ember pass theme.
+   Scoped via [data-ticket-theme="premium"]. Phase 8 will polish this
+   pass against the ticket widget; here we already swap legacy
+   blue/cyan for graphite + ember to keep the design language intact.
+   ================================================================ */
+[data-ticket-theme="premium"] {
+  --ticket-bg-from: var(--ink-400);
+  --ticket-bg-to: var(--ink-300);
+  --ticket-accent: var(--ember-400);
+  --ticket-violet: var(--forest-400);
+  --ticket-fg: var(--bone-50);
+  --ticket-fg-muted: var(--bone-400);
+  --ticket-border: rgba(250, 250, 249, 0.12);
+  --ticket-divider: rgba(250, 250, 249, 0.18);
+}
+
+[data-ticket-theme="premium"] .ticket-glow {
+  box-shadow:
+    0 0 0 1px var(--ticket-border),
+    var(--shadow-lg),
+    var(--shadow-glow-warm);
+}
+
+[data-ticket-theme="premium"] .ticket-qr-glow {
+  box-shadow:
+    0 0 0 1px var(--ticket-accent),
+    0 0 32px -4px rgba(234, 88, 12, 0.45);
+}
+
+[data-ticket-theme="premium"] .ticket-hover-lift {
+  transition: box-shadow var(--dur-slow) var(--ease-standard);
+}
+
+@media print {
+  [data-ticket-theme="premium"] {
+    --ticket-bg-from: #ffffff;
+    --ticket-bg-to: #ffffff;
+    --ticket-accent: var(--ink-400);
+    --ticket-violet: var(--ink-300);
+    --ticket-fg: var(--ink-400);
+    --ticket-fg-muted: var(--ink-200);
+    --ticket-border: rgba(14, 14, 13, 0.12);
+    --ticket-divider: rgba(14, 14, 13, 0.18);
+  }
+
+  [data-ticket-theme="premium"] .ticket-glow,
+  [data-ticket-theme="premium"] .ticket-qr-glow {
+    box-shadow: none !important;
+  }
+
+  [data-ticket-theme="premium"] .no-print { display: none !important; }
+}
+
+/* ================================================================
+   Toaster (sonner) — bone-and-ink editorial
+   Override sonner's default chrome so success/error/info/warning
+   read as soft accents on the bone canvas instead of generic
+   tech-green / tech-red panels.
+   ================================================================ */
+[data-sonner-toaster] {
+  font-family: var(--font-sans);
+  --normal-bg: var(--bone-50);
+  --normal-text: var(--ink-400);
+  --normal-border: var(--border-1);
+  --success-bg: var(--bone-50);
+  --success-text: var(--ink-400);
+  --success-border: var(--border-1);
+  --error-bg: var(--bone-50);
+  --error-text: var(--ink-400);
+  --error-border: var(--border-1);
+  --info-bg: var(--bone-50);
+  --info-text: var(--ink-400);
+  --info-border: var(--border-1);
+  --warning-bg: var(--bone-50);
+  --warning-text: var(--ink-400);
+  --warning-border: var(--border-1);
+}
+[data-sonner-toast] {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-1);
+  box-shadow: var(--shadow-md);
+  font: 500 14px/1.45 var(--font-sans);
+  letter-spacing: -0.005em;
+}
+[data-sonner-toast] [data-title] {
+  font-weight: 600;
+  color: var(--ink-400);
+}
+[data-sonner-toast] [data-description] {
+  color: var(--ink-200);
+  font-weight: 400;
+}
+[data-sonner-toast] [data-icon] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+[data-sonner-toast][data-type="success"] [data-icon] { color: var(--success); }
+[data-sonner-toast][data-type="error"] [data-icon]   { color: var(--danger); }
+[data-sonner-toast][data-type="warning"] [data-icon] { color: var(--warning); }
+[data-sonner-toast][data-type="info"] [data-icon]    { color: var(--info); }
+[data-sonner-toast] [data-close-button] {
+  background: var(--bone-100);
+  border: 1px solid var(--border-1);
+  color: var(--ink-200);
+  border-radius: var(--radius-pill);
+  width: 22px;
+  height: 22px;
+  transition: background var(--dur-fast) var(--ease-standard),
+              color var(--dur-fast) var(--ease-standard);
+}
+[data-sonner-toast] [data-close-button]:hover {
+  background: var(--bone-200);
+  color: var(--ink-400);
+}

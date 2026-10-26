@@ -1,0 +1,98 @@
+### Тестирование регистрации организации
+### Используйте этот файл в VS Code с расширением REST Client или в IntelliJ IDEA
+
+### 1. Успешная регистрация организации
+POST http://localhost:3000/api/v1/auth/organization/register
+Content-Type: application/json
+
+{
+  "organizationName": "Test OOO",
+  "email": "user@example.com",
+  "password": "Qwer123$",
+  "passwordConfirm": "Qwer123$",
+  "description": "Тестовая организация для разработки EventFlow"
+}
+
+###
+
+### 2. Регистрация без описания (опциональное поле)
+POST http://localhost:3000/api/v1/auth/organization/register
+Content-Type: application/json
+
+{
+  "organizationName": "Another Company LLC",
+  "email": "company@example.com",
+  "password": "SecurePass123!",
+  "passwordConfirm": "SecurePass123!",
+  "description": ""
+}
+
+###
+
+### 3. Ошибка: пароли не совпадают
+POST http://localhost:3000/api/v1/auth/organization/register
+Content-Type: application/json
+
+{
+  "organizationName": "Test Company",
+  "email": "test@example.com",
+  "password": "Qwer123$",
+  "passwordConfirm": "Different123$",
+  "description": ""
+}
+
+###
+
+### 4. Ошибка: слабый пароль (нет спецсимвола)
+POST http://localhost:3000/api/v1/auth/organization/register
+Content-Type: application/json
+
+{
+  "organizationName": "Test Company",
+  "email": "test2@example.com",
+  "password": "Qwer1234",
+  "passwordConfirm": "Qwer1234",
+  "description": ""
+}
+
+###
+
+### 5. Ошибка: невалидный email
+POST http://localhost:3000/api/v1/auth/organization/register
+Content-Type: application/json
+
+{
+  "organizationName": "Test Company",
+  "email": "invalid-email",
+  "password": "Qwer123$",
+  "passwordConfirm": "Qwer123$",
+  "description": ""
+}
+
+###
+
+### 6. Ошибка: дублирующийся email (если уже зарегистрирован)
+POST http://localhost:3000/api/v1/auth/organization/register
+Content-Type: application/json
+
+{
+  "organizationName": "Duplicate Organization",
+  "email": "user@example.com",
+  "password": "Qwer123$",
+  "passwordConfirm": "Qwer123$",
+  "description": ""
+}
+
+###
+
+### 7. Ошибка: отсутствуют обязательные поля
+POST http://localhost:3000/api/v1/auth/organization/register
+Content-Type: application/json
+
+{
+  "email": "test3@example.com",
+  "password": "Qwer123$"
+}
+
+###
+

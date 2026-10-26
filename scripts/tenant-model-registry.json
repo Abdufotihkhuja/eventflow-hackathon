@@ -1,0 +1,40 @@
+{
+  "$comment": "D-12b: ЕДИНСТВЕННЫЙ источник истины по tenant-моделям. Три потребителя обязаны совпадать с ним: apps/api/eslint.config.mjs (regex), scripts/check-tenant-guard.mjs (TENANT_MODELS), apps/api/src/common/tenant/tenant-scope.ts (DIRECT/EVENT/ORDER-списки). Парность проверяет apps/api/src/common/tenant/tenant-registry.spec.ts. Исключения-платформенные данные: revenueEntry, platformConfig, adminAuditLog (читает только супер-админ).",
+  "direct": [
+    "event",
+    "rentalPlace",
+    "organizationMember",
+    "organizationRole",
+    "organizationInvite",
+    "eventTag",
+    "board",
+    "blogPost",
+    "contactRequest",
+    "userFollowing",
+    "registrationFileUpload",
+    "order",
+    "planPurchase",
+    "eventCreditConsumption",
+    "planCreditAdjustment",
+    "entitlementOverride",
+    "usageEvent",
+    "usageCounter",
+    "coinLedgerEntry",
+    "payout",
+    "adOrder",
+    "organizationAccessOverride"
+  ],
+  "eventTransitive": [
+    "registration",
+    "certificate",
+    "ticketArtifact",
+    "attendance",
+    "questionAnswer",
+    "eventRecipient",
+    "speaker",
+    "agendaItem"
+  ],
+  "orderTransitive": [
+    "paymentTransaction"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "@eventflow/tsconfig — library",
+  "_comment": "For pure-TS packages that emit JS + declarations (e.g. @eventflow/ui-tokens). CommonJS output keeps the artifact consumable from both ESM bundlers (Metro/Next) and CommonJS Node configs (tailwind.config.js, jest configs).",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "target": "ES2021",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "lib": ["ES2021"],
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
+  }
+}

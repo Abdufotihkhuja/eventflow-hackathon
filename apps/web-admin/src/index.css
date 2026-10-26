@@ -1,0 +1,667 @@
+@import "../../../node_modules/tailwindcss/index.css";
+@import "../../../node_modules/tw-animate-css/dist/tw-animate.css";
+@config "../tailwind.config.ts";
+
+/* Сильная кривая для входов/выходов оверлеев: утилита ease-out-expo
+   выставляет --tw-ease, который читают animate-in/out из tw-animate-css. */
+@theme {
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+
+    /* Bone-and-ink editorial — светлая тема.
+       Cool bone canvas, graphite ink, ember accent, forest secondary.
+       HSL triplets mirror the Eventflow design-system token spec. */
+    --background: 60 9% 98%;        /* bone-100 #fbfbfa */
+    --foreground: 60 4% 5%;         /* ink-900 #0e0e0d */
+
+    --card: 0 0% 100%;              /* bone-50 */
+    --card-foreground: 60 4% 5%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 60 4% 5%;
+
+    /* Основной акцент — ember (electric orange) */
+    --primary: 21 90% 48%;          /* ember-400 #ea580c */
+    --primary-foreground: 0 0% 100%;
+
+    /* Вторичные элементы — bone */
+    --secondary: 60 9% 96%;         /* bone-200 #f5f5f3 */
+    --secondary-foreground: 60 2% 28%;  /* ink-800 */
+
+    /* Приглушённые элементы */
+    --muted: 60 9% 96%;             /* bone-200 */
+    --muted-foreground: 60 1% 43%;  /* ink-500 #6f6f6c */
+
+    /* Акцент для hover — мягкий ember-tint */
+    --accent: 24 100% 96%;          /* ember-50 #fff3eb */
+    --accent-foreground: 21 93% 40%;/* ember-500 */
+
+    /* Деструктивные действия */
+    --destructive: 8 87% 41%;       /* danger #c2270e */
+    --destructive-foreground: 0 0% 100%;
+
+    /* Границы и инпуты */
+    --border: 60 3% 86%;            /* bone-400 #dcdcda */
+    --input: 60 3% 86%;
+    --ring: 21 90% 48%;             /* ember */
+
+    /* Радиус скругления — sharp editorial (lg 8 / md 6 / sm 4) */
+    --radius: 0.5rem;
+
+    /* Цвета для графиков — brand palette */
+    --chart-1: 21 90% 48%;          /* ember */
+    --chart-2: 131 28% 34%;         /* forest */
+    --chart-3: 60 2% 28%;           /* ink */
+    --chart-4: 43 89% 38%;          /* warning gold */
+    --chart-5: 131 18% 52%;         /* forest-300 */
+
+    /* Брендовые цвета — ember / forest */
+    --brand-primary: 21 90% 48%;    /* ember-400 */
+    --brand-secondary: 131 28% 34%; /* forest-500 #3f7048 */
+    --brand-light: 24 100% 96%;     /* ember-50 */
+
+    /* Статусы */
+    --success: 141 59% 30%;         /* #1f7a3f */
+    --success-foreground: 0 0% 100%;
+    --warning: 43 89% 38%;          /* #b8860b */
+    --warning-foreground: 0 0% 100%;
+    --info: 131 28% 34%;            /* forest */
+    --info-foreground: 0 0% 100%;
+  }
+
+  .dark {
+    color-scheme: dark;
+
+    /* Graphite-ink dark — deep ink canvas, bone text, ember accent. */
+    --background: 60 4% 7%;         /* deep ink near #121211 */
+    --foreground: 60 9% 96%;        /* bone */
+
+    --card: 60 4% 10%;
+    --card-foreground: 60 9% 96%;
+
+    --popover: 60 4% 10%;
+    --popover-foreground: 60 9% 96%;
+
+    --primary: 22 92% 54%;          /* ember, slightly brighter for contrast */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 60 3% 16%;
+    --secondary-foreground: 60 9% 90%;
+
+    --muted: 60 3% 15%;
+    --muted-foreground: 60 4% 64%;  /* bone-400-ish */
+
+    --accent: 140 25% 18%;          /* forest deep */
+    --accent-foreground: 129 30% 80%;
+
+    --destructive: 8 80% 56%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 60 4% 18%;
+    --input: 60 4% 18%;
+    --ring: 22 92% 54%;
+
+    --chart-1: 22 92% 54%;          /* ember */
+    --chart-2: 131 24% 52%;         /* forest brightened */
+    --chart-3: 60 6% 72%;           /* light graphite */
+    --chart-4: 43 85% 55%;          /* gold */
+    --chart-5: 129 20% 62%;
+
+    --brand-primary: 22 92% 54%;
+    --brand-secondary: 131 24% 52%;
+    --brand-light: 140 25% 18%;
+
+    --success: 141 50% 45%;
+    --warning: 43 85% 55%;
+    --info: 131 28% 50%;
+  }
+}
+
+/* ============================================================
+   Eventflow Design System — semantic role + density layer.
+   Additive bridge over the shadcn HSL tokens above. Shared
+   primitives consume these names; colour roles point back at the
+   shadcn vars so light/dark flips automatically. Status "soft"
+   pairs and density tokens have no shadcn equivalent and are
+   defined here (with .dark overrides). Names are chosen to NOT
+   collide with any shadcn token.
+   ============================================================ */
+@layer base {
+  :root {
+    /* Surfaces */
+    --bg-canvas:  hsl(var(--background));
+    --bg-surface: hsl(var(--card));
+    --bg-sunken:  hsl(var(--secondary));
+    --bg-muted:   hsl(var(--muted));
+
+    /* Foreground */
+    --fg-strong:   hsl(var(--foreground));
+    --fg-default:  hsl(var(--foreground) / 0.82);
+    --fg-muted:    hsl(var(--muted-foreground));
+    --fg-subtle:   hsl(var(--muted-foreground) / 0.7);
+    --fg-on-brand: #ffffff;
+
+    /* Brand / accent */
+    --brand:       hsl(var(--primary));
+    --brand-soft:  hsl(var(--accent));            /* ember-50 tint */
+    --brand-soft-fg: hsl(var(--accent-foreground));
+
+    /* Borders */
+    --border-subtle:  hsl(var(--border) / 0.5);
+    --border-default: hsl(var(--border));
+    --border-strong:  hsl(var(--foreground) / 0.2);
+
+    /* Status — solid danger alias + soft pairs (light) */
+    --danger:          hsl(var(--destructive));
+    --success-soft:    #d8ebe0;  --success-soft-fg: #0f4a26;
+    --warning-soft:    #f6e6bf;  --warning-soft-fg: #5a3f06;
+    --danger-soft:     #f9d6cf;  --danger-soft-fg:  #7d1606;
+    --info-soft:       #d2e0d4;  --info-soft-fg:    #173626;
+    --neutral-soft:    hsl(var(--secondary));
+    --neutral-soft-fg: hsl(var(--muted-foreground));
+
+    /* Control heights + containers */
+    --control-h-xs: 24px; --control-h-sm: 32px; --control-h-md: 40px; --control-h-lg: 48px;
+    --container-narrow: 720px; --container-wide: 1280px; --container-full: 1440px;
+
+    /* Density (overridden per data-surface) */
+    --container:   var(--container-full);
+    --row-h:       40px;
+    --row-h-dense: 40px;
+    --body-size:   13px;
+    --section-y:   32px;
+    --shell-pad:   20px;
+  }
+
+  .dark {
+    --success-soft: rgba(78,161,106,0.16);  --success-soft-fg: #9fdcb4;
+    --warning-soft: rgba(214,155,26,0.16);  --warning-soft-fg: #e6c578;
+    --danger-soft:  rgba(223,74,46,0.18);   --danger-soft-fg:  #f0a594;
+    --info-soft:    rgba(110,154,118,0.20); --info-soft-fg:    #a9c9b0;
+    --border-strong: hsl(var(--foreground) / 0.28);
+  }
+
+  /* Surface density contexts — set data-surface on <body> */
+  [data-surface="organizer"] {
+    --container: var(--container-wide);
+    --row-h: 48px; --body-size: 14px; --section-y: 40px; --shell-pad: 24px;
+  }
+  [data-surface="admin"] {
+    --container: var(--container-full);
+    --row-h: 40px; --body-size: 13px; --section-y: 32px; --shell-pad: 20px;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html,
+  body {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+  }
+
+  html {
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+    font-variant-numeric: tabular-nums;
+    position: relative;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Editorial focus ring — ember, never invisible */
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  /* Display companion for headings — Space Grotesk, tight tracking */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', 'Manrope', system-ui, sans-serif;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  #root {
+    overflow-x: hidden;
+    max-width: 100vw;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+  
+  /* Цифры моноширинные для выравнивания */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Плавные переходы для интерактивных элементов.
+     Без transform/filter: глобальное правило не должно анимировать
+     геометрию — только цвета/тени/прозрачность. */
+  input,
+  textarea,
+  select,
+  button {
+    @apply transition-[color,background-color,border-color,box-shadow,opacity] duration-200;
+  }
+
+  /* Убираем outline для touch-устройств, но оставляем для keyboard */
+  @media (hover: none) {
+    :focus:not(:focus-visible) {
+      outline: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer utilities {
+  /* Кастомный скроллбар */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 3px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.4);
+  }
+
+  /* Firefox */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+
+  /* Появления/исчезновения оверлеев обслуживает tw-animate-css (импорт в
+     начале файла): animate-in/out читают модификаторы duration-* и ease-*.
+     Не переопределять эти классы вручную — дубли ломают каскад. */
+
+  /* Скрытие скроллбара но сохранение функционала */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Touch-optimized scroll for mobile */
+  .touch-scroll {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  /* Safe area padding for notched devices */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  /* Mobile containment - предотвращение горизонтального скролла */
+  .mobile-contain {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  /* Shimmer эффект для skeleton */
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--muted) / 0.5) 50%,
+      hsl(var(--muted)) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* Hover scale для интерактивных карточек */
+  .hover-lift {
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .hover-lift:hover {
+      transform: translateY(-2px);
+    }
+  }
+  .hover-lift:active {
+    transform: translateY(0);
+  }
+
+  /* Press эффект */
+  .press-effect {
+    transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .press-effect:active {
+    transform: scale(0.97);
+  }
+
+  /* Быстрый fade */
+  .animate-fade-in {
+    animation: fade-in 0.2s ease-out;
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* Utility для скрытия переполнения на мобильных */
+  @media (max-width: 640px) {
+    .sm\:overflow-visible {
+      overflow: visible !important;
+    }
+  }
+
+  /* Ensure tables don't cause overflow */
+  .table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Fix for fixed/sticky elements that might cause overflow */
+  .fixed:not([data-dialog-content]):not([role="dialog"]), .sticky {
+    max-width: 100vw;
+  }
+}
+
+/* ===== BlockNote Rich Text Editor Styles ===== */
+@layer components {
+  /* Контейнер редактора */
+  .rich-text-editor {
+    --bn-colors-editor-text: hsl(var(--foreground));
+    --bn-colors-editor-background: hsl(var(--background));
+    --bn-colors-menu-text: hsl(var(--foreground));
+    --bn-colors-menu-background: hsl(var(--popover));
+    --bn-colors-tooltip-text: hsl(var(--foreground));
+    --bn-colors-tooltip-background: hsl(var(--muted));
+    --bn-colors-hovered-text: hsl(var(--foreground));
+    --bn-colors-hovered-background: hsl(var(--accent));
+    --bn-colors-selected-text: hsl(var(--primary-foreground));
+    --bn-colors-selected-background: hsl(var(--primary));
+    --bn-colors-disabled-text: hsl(var(--muted-foreground));
+    --bn-colors-disabled-background: hsl(var(--muted));
+    --bn-colors-shadow: hsl(var(--border));
+    --bn-colors-border: hsl(var(--border));
+    --bn-colors-side-menu: hsl(var(--muted-foreground));
+    --bn-font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+    --bn-border-radius: var(--radius);
+  }
+
+  /* Highlight colors - светлая тема */
+  .rich-text-editor {
+    --bn-colors-highlights-gray-text: #6b7280;
+    --bn-colors-highlights-gray-background: #f3f4f6;
+    --bn-colors-highlights-brown-text: #92400e;
+    --bn-colors-highlights-brown-background: #fef3c7;
+    --bn-colors-highlights-red-text: #dc2626;
+    --bn-colors-highlights-red-background: #fee2e2;
+    --bn-colors-highlights-orange-text: #ea580c;
+    --bn-colors-highlights-orange-background: #ffedd5;
+    --bn-colors-highlights-yellow-text: #ca8a04;
+    --bn-colors-highlights-yellow-background: #fef9c3;
+    --bn-colors-highlights-green-text: #16a34a;
+    --bn-colors-highlights-green-background: #dcfce7;
+    --bn-colors-highlights-blue-text: #2563eb;
+    --bn-colors-highlights-blue-background: #dbeafe;
+    --bn-colors-highlights-purple-text: #9333ea;
+    --bn-colors-highlights-purple-background: #f3e8ff;
+    --bn-colors-highlights-pink-text: #db2777;
+    --bn-colors-highlights-pink-background: #fce7f3;
+  }
+
+  /* Highlight colors - темная тема */
+  .dark .rich-text-editor {
+    --bn-colors-highlights-gray-text: #9ca3af;
+    --bn-colors-highlights-gray-background: #374151;
+    --bn-colors-highlights-brown-text: #fbbf24;
+    --bn-colors-highlights-brown-background: #451a03;
+    --bn-colors-highlights-red-text: #f87171;
+    --bn-colors-highlights-red-background: #450a0a;
+    --bn-colors-highlights-orange-text: #fb923c;
+    --bn-colors-highlights-orange-background: #431407;
+    --bn-colors-highlights-yellow-text: #facc15;
+    --bn-colors-highlights-yellow-background: #422006;
+    --bn-colors-highlights-green-text: #4ade80;
+    --bn-colors-highlights-green-background: #052e16;
+    --bn-colors-highlights-blue-text: #60a5fa;
+    --bn-colors-highlights-blue-background: #172554;
+    --bn-colors-highlights-purple-text: #c084fc;
+    --bn-colors-highlights-purple-background: #3b0764;
+    --bn-colors-highlights-pink-text: #f472b6;
+    --bn-colors-highlights-pink-background: #500724;
+  }
+
+  /* Стили контейнера BlockNote */
+  .rich-text-editor .bn-container {
+    min-height: 200px;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .rich-text-editor .bn-editor {
+    padding: 0.75rem;
+    min-height: 180px;
+    font-size: 0.875rem;
+    line-height: 1.625;
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .rich-text-editor .bn-block-content {
+    max-width: 100%;
+    overflow-wrap: break-word;
+  }
+
+  .rich-text-editor .bn-inline-content {
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  /* Placeholder стили */
+  .rich-text-editor .bn-block-content[data-content-type="paragraph"]:has(.bn-inline-content:empty)::before {
+    content: attr(data-placeholder);
+    color: hsl(var(--muted-foreground));
+    opacity: 0.6;
+    pointer-events: none;
+    position: absolute;
+  }
+
+  /* Тулбар стили */
+  .rich-text-editor .bn-formatting-toolbar,
+  .rich-text-editor .bn-slash-menu,
+  .rich-text-editor .bn-side-menu {
+    background: hsl(var(--popover));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08), 0 2px 6px -2px rgba(0, 0, 0, 0.04);
+  }
+
+  .dark .rich-text-editor .bn-formatting-toolbar,
+  .dark .rich-text-editor .bn-slash-menu,
+  .dark .rich-text-editor .bn-side-menu {
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.3), 0 2px 6px -2px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Кнопки в тулбаре */
+  .rich-text-editor .bn-toolbar-button {
+    border-radius: calc(var(--radius) - 2px);
+    transition: all 0.15s ease;
+  }
+
+  .rich-text-editor .bn-toolbar-button:hover {
+    background: hsl(var(--accent));
+  }
+
+  .rich-text-editor .bn-toolbar-button[data-state="on"] {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+  }
+
+  /* Меню блоков */
+  .rich-text-editor .bn-slash-menu-item {
+    border-radius: calc(var(--radius) - 2px);
+    padding: 0.5rem 0.75rem;
+    transition: all 0.15s ease;
+  }
+
+  .rich-text-editor .bn-slash-menu-item:hover,
+  .rich-text-editor .bn-slash-menu-item[data-hovered="true"] {
+    background: hsl(var(--accent));
+  }
+
+  /* Drag handle */
+  .rich-text-editor .bn-drag-handle {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .rich-text-editor .bn-block-outer:hover .bn-drag-handle {
+    opacity: 1;
+  }
+
+  /* Ссылки */
+  .rich-text-editor a {
+    color: hsl(var(--primary));
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .rich-text-editor a:hover {
+    color: hsl(var(--brand-secondary));
+  }
+
+  /* Код */
+  .rich-text-editor code {
+    background: hsl(var(--muted));
+    padding: 0.125rem 0.375rem;
+    border-radius: calc(var(--radius) - 4px);
+    font-family: 'JetBrains Mono', Consolas, monospace;
+    font-size: 0.875em;
+  }
+
+  /* Цитата */
+  .rich-text-editor blockquote {
+    border-left: 2px solid hsl(var(--foreground) / 0.25);
+    padding-left: 1rem;
+    margin-left: 0;
+    color: hsl(var(--muted-foreground));
+    font-style: italic;
+  }
+
+  /* Списки */
+  .rich-text-editor ul,
+  .rich-text-editor ol {
+    padding-left: 1.5rem;
+  }
+
+  .rich-text-editor li {
+    margin: 0.25rem 0;
+  }
+
+  /* Заголовки */
+  .rich-text-editor h1 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .rich-text-editor h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.25;
+    margin-top: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .rich-text-editor h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.3;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Изображения */
+  .rich-text-editor img {
+    border-radius: var(--radius);
+    max-width: 100%;
+  }
+
+  /* Таблицы */
+  .rich-text-editor table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1rem 0;
+  }
+
+  .rich-text-editor th,
+  .rich-text-editor td {
+    border: 1px solid hsl(var(--border));
+    padding: 0.5rem 0.75rem;
+  }
+
+  .rich-text-editor th {
+    background: hsl(var(--muted));
+    font-weight: 600;
+  }
+
+  /* Read-only режим */
+  .rich-text-editor.border-none {
+    background: transparent !important;
+  }
+
+  .rich-text-editor.border-none .bn-container {
+    background: transparent !important;
+  }
+
+  .rich-text-editor.border-none .bn-editor {
+    padding: 0;
+    background: transparent !important;
+  }
+
+  .rich-text-editor.border-none .bn-drag-handle,
+  .rich-text-editor.border-none .bn-side-menu {
+    display: none;
+  }
+}

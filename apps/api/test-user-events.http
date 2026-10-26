@@ -1,0 +1,77 @@
+### Тестирование API "Мои события" для пользователя
+
+@baseUrl = http://localhost:3000/api/v1
+@accessToken = YOUR_ACCESS_TOKEN_HERE
+
+### ===========================================
+### 1. Получить все события со статистикой
+### ===========================================
+
+GET {{baseUrl}}/account/me/events
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+### ===========================================
+### 2. Получить подтверждённые события
+### ===========================================
+
+GET {{baseUrl}}/account/me/events?filter=APPROVED
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+### ===========================================
+### 3. Получить ожидающие подтверждения
+### ===========================================
+
+GET {{baseUrl}}/account/me/events?filter=PENDING
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+### ===========================================
+### 4. Получить посещённые события (с чек-ином)
+### ===========================================
+
+GET {{baseUrl}}/account/me/events?filter=ATTENDED
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+### ===========================================
+### 5. Получить отменённые события
+### ===========================================
+
+GET {{baseUrl}}/account/me/events?filter=CANCELLED
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+### ===========================================
+### 6. Поиск по названию события
+### ===========================================
+
+GET {{baseUrl}}/account/me/events?search=конференция
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+### ===========================================
+### 7. С пагинацией
+### ===========================================
+
+GET {{baseUrl}}/account/me/events?page=1&limit=5
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+### ===========================================
+### 8. Комбинированный запрос
+### ===========================================
+
+GET {{baseUrl}}/account/me/events?filter=APPROVED&search=tech&page=1&limit=10
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+### ===========================================
+### 9. Только статистика (быстрый запрос)
+### ===========================================
+
+GET {{baseUrl}}/account/me/events/stats
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+

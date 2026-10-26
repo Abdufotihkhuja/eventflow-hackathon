@@ -1,0 +1,11 @@
+{
+  "name": "@eventflow/tsconfig",
+  "private": true,
+  "version": "0.1.0",
+  "license": "SEE LICENSE IN LICENSE",
+  "files": [
+    "base.json",
+    "library.json",
+    "react-native.json"
+  ]
+}

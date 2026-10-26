@@ -1,0 +1,44 @@
+---
+description: Конвенции API для web-public
+globs:
+  - "src/shared/api/**/*"
+  - "src/features/**/*"
+  - "src/entities/**/*"
+alwaysApply: true
+---
+
+API-слой `web-public` уже живёт не в `src/api/`, а в `src/shared/api/` плюс query-хуках в `features` и `shared/lib/hooks`.
+
+## Базовые правила
+
+- Базовые сервисы и typed-клиенты размещай в `src/shared/api/`.
+- Query-хуки размещай рядом с доменной областью:
+  - в `src/features/**/model` или `src/features/**/api` для feature-specific поведения
+  - в `src/shared/lib/hooks` для truly shared hooks
+- Перед созданием нового клиента или типа проверь `src/shared/api/sdk.ts` и пакеты `@eventflow/sdk-*`.
+- Не дублируй один и тот же endpoint в нескольких местах без причины.
+
+## Что предпочитать
+
+- TanStack Query для server state.
+- Строгую типизацию ответов и ошибок.
+- Повторное использование существующих query keys, invalidation и helper-функций.
+- Небольшие, читаемые сервисы по доменным областям: `eventService.ts`, `blogService.ts`, `verificationService.ts`.
+
+## Окружение и конфиг
+
+- Используй существующие env-переменные Next.js (`NEXT_PUBLIC_*`) и текущую конфигурацию приложения.
+- Не вводи Vite-специфичные переменные в `web-public`.
+
+## Новый API-код должен
+
+- быть строго типизированным
+- не дублировать уже существующие SDK и сервисы
+- использовать существующий `queryClient` и актуальные опции TanStack Query
+- жить рядом с доменом, к которому относится
+
+## Не делай по умолчанию
+
+- не создавай новый `src/api/` только потому, что такой паттерн есть в другом приложении
+- не добавляй новый слой абстракции поверх уже работающего сервиса без явной пользы
+- не смешивай public-web API с workspace/admin API-правилами

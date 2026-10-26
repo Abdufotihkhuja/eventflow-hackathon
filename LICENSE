@@ -1,0 +1,86 @@
+EventFlow Hackathon License 1.0
+
+Copyright (c) 2026 Eventflow AI. All rights reserved.
+
+1. Definitions
+
+"Licensor" means Eventflow AI, Republic of Uzbekistan.
+
+"Software" means the source code, documentation and other material in this
+repository, excluding Third-Party Components.
+
+"Hackathon" means the President Tech Award 2026 competition, including its
+development, demonstration and judging stages.
+
+"Term" means the period from Your first access to the Software until
+1 December 2026, 00:00 Tashkent time (UTC+5), unless it ends earlier under
+section 7.
+
+"You" means an individual taking part in the Hackathon, or a member of such
+an individual's Hackathon team.
+
+2. Grant
+
+Subject to this license, Licensor grants You a worldwide, non-exclusive,
+non-transferable, non-sublicensable, royalty-free license, during the Term
+only, to use, copy and modify the Software solely to build, test, present and
+have judged a project for the Hackathon.
+
+3. Restrictions
+
+You may not:
+
+(a) use the Software, or any work derived from it, for any commercial
+    purpose, or to provide a product or service to any third party;
+(b) deploy the Software, or any work derived from it, to a production
+    environment or make it available to end users;
+(c) distribute, publish, sublicense or sell the Software, or any work derived
+    from it, except as permitted in section 4;
+(d) remove or alter this license, the copyright notice or the NOTICE file.
+
+4. Repository hosting
+
+Viewing and forking this repository on GitHub, as allowed by GitHub's Terms
+of Service, is permitted. Every fork stays subject to this license. Sharing
+the Software with members of Your Hackathon team for the purpose in section 2
+is permitted.
+
+5. Your contributions
+
+You keep the copyright in code You write. For any modification of the
+Software or other material You submit to Licensor or to this repository
+(including by pull request), You grant Licensor a perpetual, worldwide,
+non-exclusive, royalty-free, irrevocable license to use, copy, modify,
+distribute, sublicense and commercialize it, and You confirm You have the
+right to grant this license.
+
+6. Trademarks
+
+This license grants no right to use the name "EventFlow", its logos or other
+trademarks of Licensor, except to accurately describe the origin of the
+Software.
+
+7. Termination
+
+This license ends automatically at the end of the Term, or earlier if You
+breach it. When it ends, You must stop using the Software and delete all
+copies of it in Your possession, except Your own contributions to the extent
+they do not contain the Software.
+
+8. Third-Party Components
+
+Third-party components included in, or installed with, the Software are
+licensed under their own terms, listed in NOTICE and in their packages. This
+license does not limit Your rights under those terms.
+
+9. No warranty
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED. TO THE MAXIMUM EXTENT PERMITTED BY LAW, LICENSOR IS NOT LIABLE FOR
+ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM THE SOFTWARE OR ITS USE.
+
+10. Governing law
+
+This license is governed by the laws of the Republic of Uzbekistan.
+
+All rights not expressly granted in this license are reserved by Licensor.

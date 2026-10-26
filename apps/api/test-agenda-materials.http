@@ -1,0 +1,403 @@
+### ============================================
+### API Материалов Агенды Мероприятий
+### ============================================
+
+@baseUrl = http://localhost:3000/api/v1
+@organizerToken = YOUR_ORGANIZER_TOKEN_HERE
+@userToken = YOUR_USER_TOKEN_HERE
+@eventId = YOUR_EVENT_ID_HERE
+@agendaItemId = YOUR_AGENDA_ITEM_ID_HERE
+
+### ============================================
+### 1. Загрузить материал (PDF)
+### ============================================
+
+POST {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials/upload
+Authorization: Bearer {{organizerToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="presentation.pdf"
+Content-Type: application/pdf
+
+< ./uploads/materials/presentation.pdf
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### ============================================
+### 2. Загрузить материал (DOCX)
+### ============================================
+
+POST {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials/upload
+Authorization: Bearer {{organizerToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="document.docx"
+Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
+
+< ./uploads/materials/document.docx
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### ============================================
+### 3. Загрузить материал (PPTX)
+### ============================================
+
+POST {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials/upload
+Authorization: Bearer {{organizerToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="slides.pptx"
+Content-Type: application/vnd.openxmlformats-officedocument.presentationml.presentation
+
+< ./uploads/materials/slides.pptx
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### ============================================
+### 4. Загрузить несколько материалов
+### ============================================
+
+POST {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials/upload-multiple
+Authorization: Bearer {{organizerToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="files"; filename="presentation.pdf"
+Content-Type: application/pdf
+
+< ./uploads/materials/presentation.pdf
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="files"; filename="handout.docx"
+Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
+
+< ./uploads/materials/handout.docx
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="files"; filename="schedule.xlsx"
+Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+< ./uploads/materials/schedule.xlsx
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### ============================================
+### 5. Получить список материалов (Организатор)
+### ============================================
+
+GET {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials
+Authorization: Bearer {{organizerToken}}
+
+### ============================================
+### 5.1. Добавить внешний материал (официальный payload)
+### ============================================
+
+POST {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials/link
+Authorization: Bearer {{organizerToken}}
+Content-Type: application/json
+
+{
+  "url": "https://drive.google.com/file/d/xxx/view",
+  "title": "Презентация спикера"
+}
+
+### ============================================
+### 5.2. Добавить внешний материал (совместимость с фронтом)
+### ============================================
+
+POST {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials/link
+Authorization: Bearer {{organizerToken}}
+Content-Type: application/json
+
+{
+  "link": "https://drive.google.com/file/d/xxx/view",
+  "name": "Презентация спикера"
+}
+
+### ============================================
+### 6. Получить список материалов (Участник)
+### ============================================
+
+GET {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials
+Authorization: Bearer {{userToken}}
+
+### ============================================
+### 7. Скачать материал (Организатор)
+### ============================================
+
+GET {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials/download?fileUrl=/uploads/materials/uuid.pdf
+Authorization: Bearer {{organizerToken}}
+
+### ============================================
+### 8. Скачать материал (Участник)
+### ============================================
+
+GET {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials/download?fileUrl=/uploads/materials/uuid.pdf
+Authorization: Bearer {{userToken}}
+
+### ============================================
+### 9. Удалить материал
+### ============================================
+
+DELETE {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials
+Authorization: Bearer {{organizerToken}}
+Content-Type: application/json
+
+{
+  "fileUrl": "/uploads/materials/uuid.pdf"
+}
+
+### ============================================
+### ТЕСТОВЫЕ СЦЕНАРИИ
+### ============================================
+
+### ============================================
+### Сценарий 1: Полный цикл работы с материалами
+### ============================================
+
+### Шаг 1: Загрузить презентацию
+POST {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials/upload
+Authorization: Bearer {{organizerToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="presentation.pdf"
+Content-Type: application/pdf
+
+< ./uploads/materials/presentation.pdf
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Шаг 2: Получить список материалов
+GET {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials
+Authorization: Bearer {{organizerToken}}
+
+### Шаг 3: Скачать материал
+# Используйте URL из ответа Шага 1
+GET {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials/download?fileUrl=/uploads/materials/uuid.pdf
+Authorization: Bearer {{organizerToken}}
+
+### Шаг 4: Удалить материал
+# Используйте URL из ответа Шага 1
+DELETE {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials
+Authorization: Bearer {{organizerToken}}
+Content-Type: application/json
+
+{
+  "fileUrl": "/uploads/materials/uuid.pdf"
+}
+
+### Шаг 5: Проверить, что материал удален
+GET {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials
+Authorization: Bearer {{organizerToken}}
+
+### ============================================
+### Сценарий 2: Загрузка разных типов файлов
+### ============================================
+
+### PDF документ
+POST {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials/upload
+Authorization: Bearer {{organizerToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="document.pdf"
+Content-Type: application/pdf
+
+< ./uploads/materials/document.pdf
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+
+### Word документ
+POST {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials/upload
+Authorization: Bearer {{organizerToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="document.docx"
+Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
+
+< ./uploads/materials/document.docx
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+
+### PowerPoint презентация
+POST {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials/upload
+Authorization: Bearer {{organizerToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="slides.pptx"
+Content-Type: application/vnd.openxmlformats-officedocument.presentationml.presentation
+
+< ./uploads/materials/slides.pptx
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+
+### Excel таблица
+POST {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials/upload
+Authorization: Bearer {{organizerToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="data.xlsx"
+Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+< ./uploads/materials/data.xlsx
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+
+### Изображение
+POST {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials/upload
+Authorization: Bearer {{organizerToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="diagram.png"
+Content-Type: image/png
+
+< ./uploads/materials/diagram.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+
+### ZIP архив
+POST {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials/upload
+Authorization: Bearer {{organizerToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="resources.zip"
+Content-Type: application/zip
+
+< ./uploads/materials/resources.zip
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### ============================================
+### ТЕСТЫ НА ОШИБКИ
+### ============================================
+
+### ============================================
+### Ошибка 1: Загрузка без авторизации
+### ============================================
+
+POST {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials/upload
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="test.pdf"
+Content-Type: application/pdf
+
+< ./uploads/materials/test.pdf
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+# Ожидается: 401 Unauthorized
+
+### ============================================
+### Ошибка 2: Загрузка участником (не организатором)
+### ============================================
+
+POST {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials/upload
+Authorization: Bearer {{userToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="test.pdf"
+Content-Type: application/pdf
+
+< ./uploads/materials/test.pdf
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+# Ожидается: 403 Forbidden
+
+### ============================================
+### Ошибка 3: Загрузка недопустимого типа файла
+### ============================================
+
+POST {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials/upload
+Authorization: Bearer {{organizerToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="script.exe"
+Content-Type: application/x-msdownload
+
+< ./uploads/materials/script.exe
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+# Ожидается: 400 Bad Request (Недопустимый тип файла)
+
+### ============================================
+### Ошибка 4: Удаление несуществующего материала
+### ============================================
+
+DELETE {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials
+Authorization: Bearer {{organizerToken}}
+Content-Type: application/json
+
+{
+  "fileUrl": "/uploads/materials/non-existent-uuid.pdf"
+}
+
+# Ожидается: 404 Not Found
+
+### ============================================
+### Ошибка 5: Скачивание без параметра fileUrl
+### ============================================
+
+GET {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials/download
+Authorization: Bearer {{organizerToken}}
+
+# Ожидается: 400 Bad Request (Параметр fileUrl обязателен)
+
+### ============================================
+### Ошибка 6: Path Traversal атака
+### ============================================
+
+GET {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials/download?fileUrl=../../../etc/passwd
+Authorization: Bearer {{organizerToken}}
+
+# Ожидается: 400 Bad Request (Недопустимое имя файла)
+
+###
+
+DELETE {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}/materials
+Authorization: Bearer {{organizerToken}}
+Content-Type: application/json
+
+{
+  "fileUrl": "../../uploads/materials/uuid.pdf"
+}
+
+# Ожидается: 400 Bad Request (Недопустимое имя файла)
+
+### ============================================
+### ПРИМЕЧАНИЯ
+### ============================================
+
+# 1. Замените переменные в начале файла:
+#    - @organizerToken: токен организатора
+#    - @userToken: токен обычного пользователя
+#    - @eventId: ID мероприятия
+#    - @agendaItemId: ID элемента агенды
+
+# 2. Для загрузки файлов убедитесь, что файлы существуют:
+#    - ./uploads/materials/presentation.pdf
+#    - ./uploads/materials/document.docx
+#    - и т.д.
+
+# 3. Поддерживаемые типы файлов:
+#    - PDF, DOC, DOCX
+#    - PPT, PPTX
+#    - XLS, XLSX
+#    - JPEG, PNG, GIF, WebP
+#    - ZIP, RAR
+#    - TXT, MD
+
+# 4. Ограничения:
+#    - Максимальный размер файла: 50 MB
+#    - Максимум файлов за раз: 10
+
+# 5. Права доступа:
+#    - Загрузка/удаление: только организаторы
+#    - Просмотр/скачивание: все авторизованные пользователи

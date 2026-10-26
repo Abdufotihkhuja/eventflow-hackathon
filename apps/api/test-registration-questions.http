@@ -1,0 +1,162 @@
+### Тестирование API вопросов при регистрации (Режим QUESTIONS)
+
+@baseUrl = http://localhost:3000/api/v1
+@token = YOUR_JWT_TOKEN_HERE
+@eventId = YOUR_EVENT_ID_HERE
+@questionId = YOUR_QUESTION_ID_HERE
+
+### 1. Создать событие в режиме QUESTIONS
+POST {{baseUrl}}/events
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Design Conference 2026",
+  "description": "Конференция для дизайнеров всех уровней",
+  "type": "FREE",
+  "format": "HYBRID",
+  "startDate": "2026-06-15T10:00:00Z",
+  "endDate": "2026-06-15T18:00:00Z",
+  "registrationMode": "QUESTIONS"
+}
+
+### 2. Создать открытый вопрос (OPEN + TEXT)
+POST {{baseUrl}}/events/{{eventId}}/questions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "question": "Расскажите о своем опыте в дизайне",
+  "type": "TEXTAREA",
+  "category": "OPEN",
+  "isRequired": true,
+  "sortOrder": 0
+}
+
+### 3. Создать открытый вопрос (OPEN + TEXTAREA)
+POST {{baseUrl}}/events/{{eventId}}/questions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "question": "Опишите ваш самый интересный проект",
+  "type": "TEXTAREA",
+  "category": "OPEN",
+  "isRequired": false,
+  "sortOrder": 1
+}
+
+### 4. Создать закрытый вопрос (CLOSED + CHECKBOX)
+POST {{baseUrl}}/events/{{eventId}}/questions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "question": "Вы согласны с правилами мероприятия?",
+  "type": "CHECKBOX",
+  "category": "CLOSED",
+  "options": ["Да", "Нет"],
+  "isRequired": true,
+  "sortOrder": 2
+}
+
+### 5. Создать альтернативный вопрос (ALTERNATIVE + SELECT)
+POST {{baseUrl}}/events/{{eventId}}/questions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "question": "Ваша специализация",
+  "type": "SELECT",
+  "category": "ALTERNATIVE",
+  "options": ["UI/UX Design", "Graphic Design", "Motion Design", "Product Design"],
+  "isRequired": true,
+  "sortOrder": 3
+}
+
+### 6. Создать альтернативный вопрос (ALTERNATIVE + CHECKBOX)
+POST {{baseUrl}}/events/{{eventId}}/questions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "question": "Какие инструменты вы используете? (можно выбрать несколько)",
+  "type": "CHECKBOX",
+  "category": "ALTERNATIVE",
+  "options": ["Figma", "Sketch", "Adobe XD", "Photoshop", "Illustrator"],
+  "isRequired": false,
+  "sortOrder": 4
+}
+
+### 7. Создать риторический вопрос (RHETORICAL)
+POST {{baseUrl}}/events/{{eventId}}/questions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "question": "Важная информация",
+  "type": "TEXT",
+  "category": "RHETORICAL",
+  "informationalText": "Внимание! После регистрации вы получите письмо с деталями мероприятия и ссылкой на подключение. Проверьте папку спам, если письмо не пришло в течение 10 минут.",
+  "isRequired": false,
+  "sortOrder": 5
+}
+
+### 8. Попытка создать CLOSED вопрос с неправильным количеством вариантов (должна быть ошибка)
+POST {{baseUrl}}/events/{{eventId}}/questions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "question": "Тестовый вопрос",
+  "type": "CHECKBOX",
+  "category": "CLOSED",
+  "options": ["Да", "Нет", "Может быть"],
+  "isRequired": false
+}
+
+### 9. Попытка создать ALTERNATIVE без вариантов (должна быть ошибка)
+POST {{baseUrl}}/events/{{eventId}}/questions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "question": "Выберите вариант",
+  "type": "SELECT",
+  "category": "ALTERNATIVE",
+  "options": [],
+  "isRequired": false
+}
+
+### 10. Получить все вопросы события
+GET {{baseUrl}}/events/{{eventId}}/questions
+Authorization: Bearer {{token}}
+
+### 11. Обновить вопрос
+PATCH {{baseUrl}}/events/{{eventId}}/questions/{{questionId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "question": "Обновлённый текст вопроса",
+  "isRequired": false
+}
+
+### 12. Изменить порядок вопросов
+PATCH {{baseUrl}}/events/{{eventId}}/questions/reorder
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "questionIds": [
+    "question-uuid-3",
+    "question-uuid-1",
+    "question-uuid-2"
+  ]
+}
+
+### 13. Удалить вопрос
+DELETE {{baseUrl}}/events/{{eventId}}/questions/{{questionId}}
+Authorization: Bearer {{token}}
+
+###

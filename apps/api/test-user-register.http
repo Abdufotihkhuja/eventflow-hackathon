@@ -1,0 +1,195 @@
+### Тестирование регистрации пользователя
+### Используйте этот файл в VS Code с расширением REST Client или в IntelliJ IDEA
+
+### 1. Успешная регистрация пользователя
+POST http://localhost:3000/api/v1/auth/user/register
+Content-Type: application/json
+
+{
+  "firstName": "Abdufotihkhuja",
+  "lastName": "Ravshankhujaev",
+  "email": "user@example.com",
+  "password": "Qwer123$",
+  "passwordConfirm": "Qwer123$"
+}
+
+###
+
+### 2. Регистрация другого пользователя
+POST http://localhost:3000/api/v1/auth/user/register
+Content-Type: application/json
+
+{
+  "firstName": "Ivan",
+  "lastName": "Ivanov",
+  "email": "ivan.ivanov@example.com",
+  "password": "SecurePass123!",
+  "passwordConfirm": "SecurePass123!"
+}
+
+###
+
+### 3. Ошибка: пароли не совпадают
+POST http://localhost:3000/api/v1/auth/user/register
+Content-Type: application/json
+
+{
+  "firstName": "Test",
+  "lastName": "User",
+  "email": "test@example.com",
+  "password": "Qwer123$",
+  "passwordConfirm": "Different123$"
+}
+
+###
+
+### 4. Ошибка: слабый пароль (нет заглавной буквы)
+POST http://localhost:3000/api/v1/auth/user/register
+Content-Type: application/json
+
+{
+  "firstName": "Test",
+  "lastName": "User",
+  "email": "test2@example.com",
+  "password": "qwer123$",
+  "passwordConfirm": "qwer123$"
+}
+
+###
+
+### 5. Ошибка: слабый пароль (нет спецсимвола)
+POST http://localhost:3000/api/v1/auth/user/register
+Content-Type: application/json
+
+{
+  "firstName": "Test",
+  "lastName": "User",
+  "email": "test3@example.com",
+  "password": "Qwer1234",
+  "passwordConfirm": "Qwer1234"
+}
+
+###
+
+### 6. Ошибка: слабый пароль (нет цифры)
+POST http://localhost:3000/api/v1/auth/user/register
+Content-Type: application/json
+
+{
+  "firstName": "Test",
+  "lastName": "User",
+  "email": "test4@example.com",
+  "password": "Qwerty$$$",
+  "passwordConfirm": "Qwerty$$$"
+}
+
+###
+
+### 7. Ошибка: пароль слишком короткий
+POST http://localhost:3000/api/v1/auth/user/register
+Content-Type: application/json
+
+{
+  "firstName": "Test",
+  "lastName": "User",
+  "email": "test5@example.com",
+  "password": "Qw12$",
+  "passwordConfirm": "Qw12$"
+}
+
+###
+
+### 8. Ошибка: невалидный email
+POST http://localhost:3000/api/v1/auth/user/register
+Content-Type: application/json
+
+{
+  "firstName": "Test",
+  "lastName": "User",
+  "email": "invalid-email",
+  "password": "Qwer123$",
+  "passwordConfirm": "Qwer123$"
+}
+
+###
+
+### 9. Ошибка: дублирующийся email (если уже зарегистрирован)
+POST http://localhost:3000/api/v1/auth/user/register
+Content-Type: application/json
+
+{
+  "firstName": "Duplicate",
+  "lastName": "User",
+  "email": "user@example.com",
+  "password": "Qwer123$",
+  "passwordConfirm": "Qwer123$"
+}
+
+###
+
+### 10. Ошибка: отсутствует обязательное поле firstName
+POST http://localhost:3000/api/v1/auth/user/register
+Content-Type: application/json
+
+{
+  "lastName": "User",
+  "email": "test6@example.com",
+  "password": "Qwer123$",
+  "passwordConfirm": "Qwer123$"
+}
+
+###
+
+### 11. Ошибка: отсутствует обязательное поле lastName
+POST http://localhost:3000/api/v1/auth/user/register
+Content-Type: application/json
+
+{
+  "firstName": "Test",
+  "email": "test7@example.com",
+  "password": "Qwer123$",
+  "passwordConfirm": "Qwer123$"
+}
+
+###
+
+### 12. Ошибка: отсутствует passwordConfirm
+POST http://localhost:3000/api/v1/auth/user/register
+Content-Type: application/json
+
+{
+  "firstName": "Test",
+  "lastName": "User",
+  "email": "test8@example.com",
+  "password": "Qwer123$"
+}
+
+###
+
+### 13. Ошибка: пустое firstName
+POST http://localhost:3000/api/v1/auth/user/register
+Content-Type: application/json
+
+{
+  "firstName": "",
+  "lastName": "User",
+  "email": "test9@example.com",
+  "password": "Qwer123$",
+  "passwordConfirm": "Qwer123$"
+}
+
+###
+
+### 14. Ошибка: пустое lastName
+POST http://localhost:3000/api/v1/auth/user/register
+Content-Type: application/json
+
+{
+  "firstName": "Test",
+  "lastName": "",
+  "email": "test10@example.com",
+  "password": "Qwer123$",
+  "passwordConfirm": "Qwer123$"
+}
+
+###

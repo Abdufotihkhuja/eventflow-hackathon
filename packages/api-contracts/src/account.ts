@@ -1,0 +1,25 @@
+import type { paths } from "./generated/openapi.js";
+
+type FilterPaths<Prefixes extends string> = {
+  [Key in keyof paths as Key extends `${Prefixes}${string}`
+    ? Key
+    : never]: paths[Key];
+};
+
+type ExactPaths<Keys extends keyof paths> = Pick<paths, Keys>;
+
+export type AccountApiPaths = FilterPaths<
+  | "/api/v1/auth"
+  | "/api/v1/account"
+  // Личный Account-скоуп вне /account: /me/organizations, /me/devices,
+  // /me/notification-preferences (BL-13; слэш в префиксе, чтобы не зацепить
+  // будущие /api/v1/me…-пути других поверхностей).
+  | "/api/v1/me/"
+  | "/api/v1/session"
+  | "/api/v1/verification"
+  | "/api/v1/my-registrations"
+  | "/api/v1/registrations"
+  | "/api/v1/certificates"
+  | "/api/v1/public"
+> &
+  ExactPaths<"/api/v1/account/me/following-organizations">;

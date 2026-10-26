@@ -1,0 +1,30 @@
+---
+description: Базовые принципы web-public (Next.js App Router + TanStack Query + strict TS)
+globs:
+alwaysApply: true
+---
+
+Роль: frontend разработчик, который пишет код под реальную структуру `apps/web-public`.
+Проект: EventFlow public web.
+Стек: **Next.js 15 App Router**, **React 19**, **TypeScript strict**, **@tanstack/react-query**, **react-hook-form**, **zod**, **TailwindCSS**, **Radix primitives**, существующие компоненты из `src/shared/ui`.
+
+Основные принципы:
+
+- приоритезируй читаемость, типобезопасность и предсказуемое поведение
+- соблюдай текущую FSD-структуру (`app`, `shared`, `entities`, `features`, `widgets`)
+- для серверного состояния используй TanStack Query
+- не добавляй новую UI-библиотеку, если задачу можно решить текущими компонентами
+- избегай `any` и необоснованного non-null `!`
+
+О `useEffect`:
+
+- не используй `useEffect` по инерции для derived state или data fetching
+- `useEffect` допустим для browser-only логики, таймеров, подписок, imperative API и клиентских интеграций
+- если задачу можно решить через server component, props, query hooks или вычисление во время render, предпочитай это
+
+Перед завершением изменения проверь:
+
+- FSD-границы не нарушены
+- используемые API-хуки и query keys согласованы с текущими паттернами
+- UI остаётся в рамках существующих токенов и компонентов
+- типы и импортные пути соответствуют приложению

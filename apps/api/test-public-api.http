@@ -1,0 +1,51 @@
+### Variables
+@baseUrl = http://localhost:3000/api/v1
+
+### ============================================
+### Public API Tests (No Auth Required)
+### ============================================
+
+### 1. Получить статистику платформы
+GET {{baseUrl}}/public/stats
+Content-Type: application/json
+
+### 2. Получить статистику организации
+GET {{baseUrl}}/public/organizations/{{organizationId}}/stats
+Content-Type: application/json
+
+### ============================================
+### Public Events
+### ============================================
+
+### 3. Получить список предстоящих событий
+GET {{baseUrl}}/public/events?filter=upcoming
+Content-Type: application/json
+
+### 4. Получить список прошедших событий
+GET {{baseUrl}}/public/events?filter=past&page=1&limit=10
+Content-Type: application/json
+
+### 5. Поиск событий по названию
+GET {{baseUrl}}/public/events?search=conference
+Content-Type: application/json
+
+### 6. Фильтр по городу
+GET {{baseUrl}}/public/events?city=Ташкент
+Content-Type: application/json
+
+### 7. Фильтр по формату (ONLINE, OFFLINE, HYBRID)
+GET {{baseUrl}}/public/events?format=OFFLINE
+Content-Type: application/json
+
+### 8. Фильтр по типу (FREE, PAID)
+GET {{baseUrl}}/public/events?type=FREE
+Content-Type: application/json
+
+### 9. Комбинированный фильтр
+GET {{baseUrl}}/public/events?city=Ташкент&format=OFFLINE&type=FREE&page=1&limit=20
+Content-Type: application/json
+
+### 10. Получить событие по ID
+GET {{baseUrl}}/public/events/{{eventId}}
+Content-Type: application/json
+

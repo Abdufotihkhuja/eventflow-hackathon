@@ -1,0 +1,4 @@
+-- This migration directory existed without a SQL file, which breaks
+-- `prisma migrate deploy` during container startup.
+-- The schema changes for organization company fields were applied
+-- by subsequent migrations, so this migration remains intentionally empty.

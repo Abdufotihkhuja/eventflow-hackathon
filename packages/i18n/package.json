@@ -1,0 +1,33 @@
+{
+  "name": "@eventflow/i18n",
+  "private": true,
+  "version": "0.1.0",
+  "license": "SEE LICENSE IN LICENSE",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./src/react/index.ts",
+      "default": "./dist/react/index.js"
+    },
+    "./next": {
+      "types": "./src/next/index.ts",
+      "default": "./dist/next/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "i18n:check": "node --experimental-strip-types scripts/check-i18n.ts",
+    "i18n:scan": "node --experimental-strip-types scripts/scan-hardcoded.ts",
+    "type-check": "tsc -p tsconfig.json --noEmit"
+  },
+  "peerDependencies": {
+    "react": ">=19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.16"
+  }
+}

@@ -1,0 +1,140 @@
+### Тестирование API программы мероприятия (Agenda)
+
+@baseUrl = http://localhost:3000/api/v1
+@token = YOUR_JWT_TOKEN_HERE
+@eventId = YOUR_EVENT_ID_HERE
+@speakerId = YOUR_SPEAKER_ID_HERE
+@agendaItemId = YOUR_AGENDA_ITEM_ID_HERE
+
+### 1. Создать пункт программы - Открытие (KEYNOTE)
+POST {{baseUrl}}/events/{{eventId}}/agenda
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Открытие конференции",
+  "description": "Приветственное слово организаторов и обзор программы",
+  "type": "KEYNOTE",
+  "startTime": "10:00",
+  "duration": 60,
+  "location": "Главный зал",
+  "materials": [
+    "https://example.com/opening-presentation.pdf"
+  ],
+  "speakerIds": ["{{speakerId}}"]
+}
+
+### 2. Создать пункт программы - Презентация
+POST {{baseUrl}}/events/{{eventId}}/agenda
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Инновации в искусственном интеллекте",
+  "description": "Обзор последних достижений в области AI и машинного обучения",
+  "type": "PRESENTATION",
+  "startTime": "11:00",
+  "duration": 60,
+  "location": "Зал А",
+  "materials": [
+    "https://example.com/ai-presentation.pdf",
+    "https://example.com/ai-materials.zip"
+  ],
+  "speakerIds": ["{{speakerId}}"]
+}
+
+### 3. Создать пункт программы - Воркшоп
+POST {{baseUrl}}/events/{{eventId}}/agenda
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Практический воркшоп: Создание чат-бота",
+  "description": "Практическое занятие по созданию чат-бота с использованием GPT-4",
+  "type": "WORKSHOP",
+  "startTime": "13:00",
+  "duration": 120,
+  "location": "Зал Б, Комната 101",
+  "materials": [
+    "https://example.com/workshop-guide.pdf",
+    "https://github.com/example/chatbot-starter"
+  ]
+}
+
+### 4. Создать пункт программы - Перерыв
+POST {{baseUrl}}/events/{{eventId}}/agenda
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Кофе-брейк",
+  "type": "BREAK",
+  "startTime": "12:00",
+  "duration": 30,
+  "location": "Фойе"
+}
+
+### 5. Создать пункт программы - Нетворкинг
+POST {{baseUrl}}/events/{{eventId}}/agenda
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Networking Session",
+  "description": "Свободное общение участников и обмен контактами",
+  "type": "NETWORKING",
+  "startTime": "15:00",
+  "duration": 60,
+  "location": "Терраса"
+}
+
+### 6. Создать пункт программы - Панельная дискуссия
+POST {{baseUrl}}/events/{{eventId}}/agenda
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Панельная дискуссия: Будущее технологий",
+  "description": "Обсуждение трендов и прогнозов на ближайшие 5 лет",
+  "type": "PANEL",
+  "startTime": "16:00",
+  "duration": 90,
+  "location": "Главный зал"
+}
+
+### 7. Получить всю программу события
+GET {{baseUrl}}/events/{{eventId}}/agenda
+Authorization: Bearer {{token}}
+
+### 8. Обновить пункт программы
+PATCH {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Обновлённое название",
+  "duration": 90,
+  "materials": [
+    "https://example.com/updated-presentation.pdf",
+    "https://example.com/additional-materials.pdf"
+  ]
+}
+
+### 9. Изменить порядок программы
+PATCH {{baseUrl}}/events/{{eventId}}/agenda/reorder
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "itemIds": [
+    "item-uuid-1",
+    "item-uuid-2",
+    "item-uuid-3"
+  ]
+}
+
+### 10. Удалить пункт программы
+DELETE {{baseUrl}}/events/{{eventId}}/agenda/{{agendaItemId}}
+Authorization: Bearer {{token}}
+
+###

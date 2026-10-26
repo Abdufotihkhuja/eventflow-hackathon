@@ -1,0 +1,25 @@
+export {
+  registrationKeys,
+  useMyRegistrationsQuery,
+  useTicketQrQuery,
+  useRegisterMutation,
+  useCancelRegistrationMutation,
+  useEventRegistrationsQuery,
+  useEventRegistrationsInfiniteQuery,
+  ATTENDEES_PAGE_SIZE,
+  useApproveRegistrationMutation,
+  useRejectRegistrationMutation,
+  useBulkApproveMutation,
+  useBulkRejectMutation,
+  useCheckInMutation,
+  // Cache surgery behind the optimistic queue — exported so its rollback can
+  // be exercised directly; see __tests__/registrations-optimistic.
+  optimisticStatus,
+  rollback,
+  type CheckInResult,
+  type MyRegistrationsQuery,
+  type EventRegistrationsQuery,
+  type EventRegistrationsResult,
+  type OrgRegistrationItem,
+  type OrgRegStatus,
+} from "./api";

@@ -1,0 +1,24 @@
+---
+description: Базовые принципы web-workspace (Vite + React 19 + Router 7 + TanStack Query)
+globs:
+alwaysApply: true
+---
+
+Пиши изменения под реальную структуру `apps/web-workspace`, а не под абстрактный React-шаблон.
+
+Стек приложения: **Vite**, **React 19**, **TypeScript**, **react-router-dom 7**, **@tanstack/react-query**, **react-hook-form**, **zod**, **Tailwind**, **Radix**, **Mantine**.
+
+Основные принципы:
+
+- код должен следовать текущей структуре `src/app`, `src/pages`, `src/widgets`, `src/features`, `src/entities`, `src/shared`
+- для серверного состояния используй TanStack Query
+- не добавляй RTK Query, Redux или другой state manager без явной причины
+- избегай `any` и необоснованного non-null `!`
+
+**Проверка перед мёржем:**
+
+- [ ] Структура FSD корректна; импорты без нарушений «сверху вниз».
+- [ ] Роутинг остаётся совместимым с `createBrowserRouter`.
+- [ ] TanStack Query: query keys и invalidation согласованы с текущими хуками.
+- [ ] Компоненты используют существующий набор UI-инструментов проекта, а не новый стек поверх него.
+- [ ] Линтер/форматтер пройдены; соглашения — см. `code-style-react-ts.mdc`, `routing-react-router.mdc`, `ui-tailwind-shadcn.mdc`.

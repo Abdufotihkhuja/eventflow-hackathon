@@ -1,0 +1,107 @@
+### Сертификаты пользователя - Тесты
+
+@baseUrl = http://localhost:3000/api/v1
+@accessToken = YOUR_ACCESS_TOKEN_HERE
+
+### 1. Получить список сертификатов со статистикой
+GET {{baseUrl}}/account/me/certificates
+Authorization: Bearer {{accessToken}}
+
+###
+
+### 2. Получить сертификаты с поиском
+GET {{baseUrl}}/account/me/certificates?search=Eventflow
+Authorization: Bearer {{accessToken}}
+
+###
+
+### 3. Получить только верифицированные сертификаты
+GET {{baseUrl}}/account/me/certificates?filter=verified
+Authorization: Bearer {{accessToken}}
+
+###
+
+### 4. Получить только неверифицированные сертификаты
+GET {{baseUrl}}/account/me/certificates?filter=unverified
+Authorization: Bearer {{accessToken}}
+
+###
+
+### 5. Получить статистику сертификатов
+GET {{baseUrl}}/account/me/certificates/stats
+Authorization: Bearer {{accessToken}}
+
+###
+
+### 6. Создать новый сертификат
+POST {{baseUrl}}/account/me/certificates
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Eventflow Pro Coordinator",
+  "provider": "EVENTFLOW ACADEMY",
+  "description": "Продвинутая программа по автоматизации потоков и аналитике Eventflow.",
+  "issueDate": "2024-12-15",
+  "trainingHours": 48,
+  "credentialId": "EVT-PRO-4829",
+  "credentialUrl": "https://verify.eventflow.com/cert/EVT-PRO-4829",
+  "certificateUrl": "https://cdn.eventflow.com/certificates/cert-4829.pdf",
+  "skills": ["QR & RFID", "Incident Response", "Stakeholder Ops"],
+  "color": "#F59E0B"
+}
+
+###
+
+### 7. Создать сертификат с минимальными данными
+POST {{baseUrl}}/account/me/certificates
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Customer Experience Architect",
+  "provider": "CX COLLECTIVE",
+  "issueDate": "2023-07-03"
+}
+
+###
+
+### 8. Получить сертификат по ID
+# Замените CERTIFICATE_ID на реальный UUID
+@certificateId = YOUR_CERTIFICATE_ID_HERE
+
+GET {{baseUrl}}/account/me/certificates/{{certificateId}}
+Authorization: Bearer {{accessToken}}
+
+###
+
+### 9. Обновить сертификат
+PATCH {{baseUrl}}/account/me/certificates/{{certificateId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "description": "Обновлённое описание сертификата",
+  "trainingHours": 56,
+  "skills": ["Service Design", "Journey Mapping", "Workshop Facilitation"]
+}
+
+###
+
+### 10. Обновить цвет карточки сертификата
+PATCH {{baseUrl}}/account/me/certificates/{{certificateId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "color": "#8B5CF6"
+}
+
+###
+
+### 11. Удалить сертификат
+DELETE {{baseUrl}}/account/me/certificates/{{certificateId}}
+Authorization: Bearer {{accessToken}}
+
+###
+

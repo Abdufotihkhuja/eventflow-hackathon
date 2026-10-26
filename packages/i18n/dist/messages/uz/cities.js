@@ -1,0 +1,23 @@
+export const cities = {
+    tashkent: "Toshkent",
+    samarkand: "Samarqand",
+    bukhara: "Buxoro",
+    andijan: "Andijon",
+    namangan: "Namangan",
+    fergana: "Fargʻona",
+    nukus: "Nukus",
+    qarshi: "Qarshi",
+    termez: "Termiz",
+    urgench: "Urganch",
+    khiva: "Xiva",
+    navoi: "Navoiy",
+    jizzakh: "Jizzax",
+    gulistan: "Guliston",
+    nurafshon: "Nurafshon",
+    kokand: "Qoʻqon",
+    margilan: "Margʻilon",
+    chirchiq: "Chirchiq",
+    angren: "Angren",
+    almalyk: "Olmaliq",
+};
+//# sourceMappingURL=cities.js.map

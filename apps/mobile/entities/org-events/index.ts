@@ -1,0 +1,41 @@
+export {
+  orgEventsKeys,
+  useOrgEventsListQuery,
+  useOrgEventsInfiniteQuery,
+  useOrgEventsCountQuery,
+  useOrgEventQuery,
+  useOrgEventDetailQuery,
+  type OrgEventsListQuery,
+  type OrgEventsFilter,
+  type OrgEventLifecycle,
+} from "./api";
+export {
+  lifecycleOf,
+  toOrgEventRow,
+  toOrgEventDetail,
+  type OrgEventRow,
+  type OrgEventDetail,
+  type OrgEventStatus,
+} from "./model";
+// --- W7 additions (append-only) ---
+export {
+  plainTextToBlocks,
+  blocksToPlainText,
+  uploadCoverImage,
+  suggestSlug,
+  checkSlug,
+  translateFields,
+  EVENT_LOCALES,
+  TRANSLATABLE_FIELDS,
+  useCreateEventMutation,
+  useUpdateEventMutation,
+  useSubmitReviewMutation,
+  useCancelEventMutation,
+  useDeleteEventMutation,
+  useCompleteEventMutation,
+  type EventFormPayload,
+  type EventAccessType,
+  type EventLocale,
+  type EventTranslations,
+  type TranslatableField,
+} from "./mutations";

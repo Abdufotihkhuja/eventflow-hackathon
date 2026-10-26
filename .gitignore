@@ -1,0 +1,24 @@
+node_modules
+.env
+.env.local
+.DS_Store
+storage/uploads/*
+!storage/uploads/.gitkeep
+storage/backups/*
+!storage/backups/.gitkeep
+apps/*/node_modules
+apps/*/dist
+apps/*/.next
+apps/*/coverage
+packages/*/node_modules
+
+# Claude Code tooling
+.claude/launch.json
+.claude/scheduled_tasks.lock
+.claude/settings.json
+.claude/worktrees/
+storage/app-builds/
+storage/registration-files/
+
+# Local design-spec cache from claude.ai/design sessions (not source code)
+.design-cache/

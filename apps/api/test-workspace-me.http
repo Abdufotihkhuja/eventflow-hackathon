@@ -1,0 +1,177 @@
+### Тестирование /api/v1/workspace/me
+### Используйте этот файл в VS Code с расширением REST Client или в IntelliJ IDEA
+### ВАЖНО: Замените {{accessToken}} на реальный токен организации
+
+@baseUrl = http://localhost:3000/api/v1
+@accessToken = YOUR_ACCESS_TOKEN_HERE
+
+### 1. Получить данные текущей организации
+GET {{baseUrl}}/workspace/me
+Authorization: Bearer {{accessToken}}
+
+###
+
+### 2. Обновить только название организации
+PATCH {{baseUrl}}/workspace/me
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "organizationName": "Updated Company Name"
+}
+
+###
+
+### 3. Обновить все поля организации
+PATCH {{baseUrl}}/workspace/me
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "organizationName": "Test OOO Updated",
+  "description": "Мы занимаемся организацией мероприятий любого масштаба",
+  "phone": "+79001234567",
+  "logoUrl": "https://example.com/logo.png"
+}
+
+###
+
+### 4. Обновить только описание
+PATCH {{baseUrl}}/workspace/me
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "description": "Новое описание нашей компании"
+}
+
+###
+
+### 5. Обновить только телефон
+PATCH {{baseUrl}}/workspace/me
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "phone": "+998901234567"
+}
+
+###
+
+### 6. Обновить только логотип
+PATCH {{baseUrl}}/workspace/me
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "logoUrl": "https://cdn.example.com/new-logo.jpg"
+}
+
+###
+
+### 7. Очистить опциональные поля (установить null)
+PATCH {{baseUrl}}/workspace/me
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "description": "",
+  "phone": "",
+  "logoUrl": ""
+}
+
+###
+
+### 8. Ошибка: невалидный телефон
+PATCH {{baseUrl}}/workspace/me
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "phone": "invalid-phone"
+}
+
+###
+
+### 9. Ошибка: невалидный URL логотипа
+PATCH {{baseUrl}}/workspace/me
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "logoUrl": "not-a-valid-url"
+}
+
+###
+
+### 10. Ошибка: название слишком длинное (>200 символов)
+PATCH {{baseUrl}}/workspace/me
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "organizationName": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore"
+}
+
+###
+
+### 11. Ошибка: описание слишком длинное (>2000 символов)
+PATCH {{baseUrl}}/workspace/me
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "description": "Lorem ipsum dolor sit amet... (2001+ символов)"
+}
+
+###
+
+### 12. Удалить организацию (ОПАСНО!)
+### Раскомментируйте только если действительно хотите удалить
+# DELETE {{baseUrl}}/workspace/me
+# Authorization: Bearer {{accessToken}}
+
+###
+
+### Тестовый сценарий: регистрация -> получение -> обновление
+
+### Шаг 1: Зарегистрировать организацию
+POST {{baseUrl}}/auth/organization/register
+Content-Type: application/json
+
+{
+  "organizationName": "Test Company for API",
+  "email": "test-org-api@example.com",
+  "password": "Qwer123$",
+  "passwordConfirm": "Qwer123$",
+  "description": "Test organization"
+}
+
+# Скопируйте accessToken из ответа
+
+###
+
+### Шаг 2: Получить данные организации (используйте токен из шага 1)
+# GET {{baseUrl}}/workspace/me
+# Authorization: Bearer ТОКЕН_ИЗ_ШАГА_1
+
+###
+
+### Шаг 3: Обновить данные организации
+# PATCH {{baseUrl}}/workspace/me
+# Authorization: Bearer ТОКЕН_ИЗ_ШАГА_1
+# Content-Type: application/json
+#
+# {
+#   "organizationName": "Updated Test Company",
+#   "description": "Updated description",
+#   "phone": "+79001234567"
+# }
+
+###
+
+### Шаг 4: Проверить обновление
+# GET {{baseUrl}}/workspace/me
+# Authorization: Bearer ТОКЕН_ИЗ_ШАГА_1
+
+###

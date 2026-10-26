@@ -1,0 +1,36 @@
+export const registrations = {
+    title: "Ro'yxatdan o'tishlar",
+    status: {
+        pending: "Kutilmoqda",
+        approved: "Tasdiqlangan",
+        confirmed: "Tasdiqlangan",
+        rejected: "Rad etilgan",
+        cancelled: "Bekor qilingan",
+        waitlist: "Kutish ro'yxatida",
+    },
+    role: {
+        participant: "Ishtirokchi",
+        speaker: "Spiker",
+        organizer: "Tashkilotchi",
+        volunteer: "Ko'ngilli",
+    },
+    detail: {
+        title: "Ro'yxatdan o'tish tafsilotlari",
+        loadError: "Ro'yxatdan o'tish ma'lumotlarini yuklab bo'lmadi",
+        registered: "Ro'yxatdan o'tgan",
+        testResult: "Test natijasi",
+        minimum: "minimum",
+        passed: "O'tdi",
+        failed: "O'tmadi",
+        answers: "Savollarga javoblar",
+        noAnswers: "Ro'yxatdan o'tish savollariga javoblar yo'q",
+    },
+    certificates: {
+        selectAtLeastOne: "Kamida bitta ishtirokchini tanlang",
+        issueTitle: "Sertifikat berish",
+        issueDescription: "Sertifikat berish uchun ishtirokchilarni belgilang",
+        noParticipants: "Ishtirokchilar yo'q",
+        selectAll: "Barchasini tanlash ({count})",
+    },
+};
+//# sourceMappingURL=registrations.js.map
